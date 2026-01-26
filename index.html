@@ -14,7 +14,6 @@
             /* ULTRA SHINY GOLD PALETTE */
             --bg-deep: #050510;
             --glass-bg: rgba(15, 15, 25, 0.85);
-            /* Luxury Gold Gradients */
             --gold-gradient: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
             --gold-text: #FDB931; 
             --gold-border: rgba(255, 215, 0, 0.4);
@@ -34,10 +33,7 @@
         /* 3D Background Canvas */
         #canvas-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
             background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
         }
@@ -76,15 +72,11 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            /* Enhance Shininess */
             filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.5));
             animation: shine 5s infinite linear;
         }
         
-        @keyframes shine {
-            0% { background-position: 0; }
-            100% { background-position: 1000px; }
-        }
+        @keyframes shine { 0% { background-position: 0; } 100% { background-position: 1000px; } }
 
         h2 {
             font-family: 'Lato', sans-serif;
@@ -94,131 +86,43 @@
             margin-top: 15px;
             letter-spacing: 3px;
             text-transform: uppercase;
-            text-shadow: 0 0 5px rgba(255,255,255,0.3);
         }
 
         /* Controls */
-        .controls {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
+        .controls { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
         select, input {
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: 1px solid var(--gold-border);
-            background: rgba(0, 0, 0, 0.7);
-            color: #fcf6ba;
-            font-family: 'Lato', sans-serif;
-            font-size: 1rem;
-            outline: none;
-            transition: 0.3s;
+            padding: 12px 20px; border-radius: 8px; border: 1px solid var(--gold-border);
+            background: rgba(0, 0, 0, 0.7); color: #fcf6ba; font-family: 'Lato', sans-serif; font-size: 1rem; outline: none; transition: 0.3s;
         }
-        
-        select:focus, input:focus {
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-            border-color: #ffd700;
-        }
+        select:focus, input:focus { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); border-color: #ffd700; }
 
         button {
-            padding: 12px 30px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: 'Cinzel', serif;
-            letter-spacing: 1px;
-            transition: all 0.2s;
-            /* Shiny Gold Button */
+            padding: 12px 30px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer;
+            font-family: 'Cinzel', serif; letter-spacing: 1px; transition: all 0.2s;
             background: linear-gradient(135deg, #b38728, #fcf6ba, #bf953f);
-            color: #1a0500;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-            border: 1px solid #ffd700;
+            color: #1a0500; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); border: 1px solid #ffd700;
         }
-
-        button:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.7);
-        }
-
-        button.secondary {
-            background: transparent;
-            border: 1px solid #fcf6ba;
-            color: #fcf6ba;
-            box-shadow: none;
-        }
-        
-        button.secondary:hover {
-            background: rgba(255, 215, 0, 0.15);
-            color: white;
-        }
+        button:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 6px 25px rgba(255, 215, 0, 0.7); }
+        button.secondary { background: transparent; border: 1px solid #fcf6ba; color: #fcf6ba; box-shadow: none; }
+        button.secondary:hover { background: rgba(255, 215, 0, 0.15); color: white; }
 
         /* Question Cards */
         .quiz-area { display: none; animation: fadeIn 0.8s ease; }
-
         .question-card {
-            background: rgba(255, 255, 255, 0.04);
-            margin-bottom: 2rem;
-            padding: 2rem;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
-            border-left: 4px solid #b38728;
+            background: rgba(255, 255, 255, 0.04); margin-bottom: 2rem; padding: 2rem;
+            border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); border-left: 4px solid #b38728;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-
-        .question-text {
-            font-size: 1.25rem;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
-
-        .question-options-block {
-            margin-top: 1.2rem;
-            padding-left: 1.5rem;
-            color: #d1d5db;
-            font-size: 1.15rem;
-            line-height: 2;
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-top: 1.5rem;
-        }
-
+        .question-text { font-size: 1.25rem; line-height: 1.6; margin-bottom: 1.5rem; }
+        .question-options-block { margin-top: 1.2rem; padding-left: 1.5rem; color: #d1d5db; font-size: 1.15rem; line-height: 2; border-left: 1px solid rgba(255, 255, 255, 0.2); }
+        .options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 1.5rem; }
         .option-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-            background: rgba(255, 215, 0, 0.05);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #fcf6ba;
-            font-weight: bold;
-            font-family: 'Cinzel', serif;
+            display: flex; align-items: center; justify-content: center; padding: 12px;
+            background: rgba(255, 215, 0, 0.05); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; color: #fcf6ba; font-weight: bold; font-family: 'Cinzel', serif;
         }
-
-        .option-label:hover {
-            background: rgba(255, 215, 0, 0.25);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .option-label.checked {
-            background: linear-gradient(135deg, #b38728, #fcf6ba);
-            color: #222;
-            border-color: #fff;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
-        }
-
+        .option-label:hover { background: rgba(255, 215, 0, 0.25); box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); transform: translateY(-2px); }
+        .option-label.checked { background: linear-gradient(135deg, #b38728, #fcf6ba); color: #222; border-color: #fff; box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
         .option-label input { display: none; }
 
         /* Feedback */
@@ -228,69 +132,63 @@
 
         /* Results */
         .results-area { display: none; text-align: center; animation: fadeIn 0.8s ease; }
-        
         .score-display {
-            font-size: 5rem;
-            font-family: 'Cinzel', serif;
-            /* Gradient Text */
+            font-size: 5rem; font-family: 'Cinzel', serif;
             background: linear-gradient(to bottom, #ffffbe 0%, #d4af37 50%, #b8860b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 1rem 0;
-            font-weight: bold;
-            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin: 1rem 0; font-weight: bold; filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
         }
-
         .info-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1.5rem;
-            max-width: 650px;
-            margin: 30px auto;
-            text-align: left;
-            padding: 25px;
-            background: rgba(0,0,0,0.4);
-            border-radius: 16px;
-            border: 1px solid rgba(255,215,0,0.1);
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; max-width: 650px;
+            margin: 30px auto; text-align: left; padding: 25px;
+            background: rgba(0,0,0,0.4); border-radius: 16px; border: 1px solid rgba(255,215,0,0.1);
         }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #fcf6ba;
-            font-size: 0.95rem;
-            letter-spacing: 1px;
-        }
-        
+        .input-group label { display: block; margin-bottom: 8px; color: #fcf6ba; font-size: 0.95rem; letter-spacing: 1px; }
         .input-group input { width: 100%; box-sizing: border-box; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
         .loader {
-            border: 4px solid rgba(255,215,0,0.1);
-            border-left-color: #ffd700;
-            border-radius: 50%;
-            width: 50px; height: 50px;
-            animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-            display: none; margin: 30px auto;
-            box-shadow: 0 0 20px rgba(255,215,0,0.2);
+            border: 4px solid rgba(255,215,0,0.1); border-left-color: #ffd700; border-radius: 50%; width: 50px; height: 50px;
+            animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite; display: none; margin: 30px auto; box-shadow: 0 0 20px rgba(255,215,0,0.2);
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Styles for the "Ghost" Certificate (Hidden until generation) */
-        #certificate-ghost {
-            position: fixed;
-            top: -9999px;
-            left: -9999px;
-            width: 800px; /* A4 Ratio width */
-            background: white;
-            color: black;
-            font-family: 'Times New Roman', serif;
-            padding: 40px;
-            border: 10px solid #222;
-            box-sizing: border-box;
-            z-index: 1000;
+        /* --- PREVIEW MODAL STYLES --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); z-index: 2000;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
         }
+        .modal-content {
+            background: #ffffff; /* Paper white */
+            color: #000000;      /* Ink black */
+            width: 90%; max-width: 800px; height: 90%;
+            overflow-y: auto;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
+            position: relative;
+            display: flex; flex-direction: column;
+        }
+        .report-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; font-family: serif; }
+        .report-details { display: flex; justify-content: space-between; margin-bottom: 20px; font-family: sans-serif; font-size: 14px; background: #f5f5f5; padding: 15px; }
+        .report-body { font-family: serif; flex-grow: 1; }
+        
+        /* Report Question Styles */
+        .report-q-item { margin-bottom: 25px; page-break-inside: avoid; border-bottom: 1px dashed #ccc; padding-bottom: 20px; }
+        .report-q-text { font-weight: bold; margin-bottom: 10px; font-size: 16px; }
+        .report-options { margin-left: 20px; color: #444; font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
+        .report-status { font-family: sans-serif; font-size: 13px; font-weight: bold; padding: 5px 10px; border-radius: 4px; display: inline-block; }
+        .status-correct { background: #e6fffa; color: #047857; border: 1px solid #047857; }
+        .status-wrong { background: #fff5f5; color: #c53030; border: 1px solid #c53030; }
+
+        .modal-actions {
+            margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;
+            display: flex; gap: 15px; justify-content: center;
+        }
+        .btn-download { background: #000; color: #fff; border: none; }
+        .btn-close { background: #fff; color: #000; border: 1px solid #000; }
 
     </style>
 </head>
@@ -356,29 +254,47 @@
             </div>
 
             <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
-                <button onclick="downloadPDF()">Download Certified PDF</button>
+                <button onclick="openPreviewModal()">Review & Download Report</button>
                 <button class="secondary" onclick="resetApp()">New Quiz</button>
             </div>
-            <p id="pdf-status" style="margin-top:10px; font-size:0.9rem; color:#aaa; display:none;"></p>
         </div>
     </div>
 
-    <div id="certificate-template" style="display:none;">
-        <div style="border: 5px double #000; padding: 20px; height: 100%; box-sizing: border-box; text-align: center;">
-            <h1 style="font-family: serif; font-size: 36px; margin-bottom: 5px; color: #000; text-shadow:none;">Shirley's Interactive iVocab Reader</h1>
-            <h2 style="font-family: sans-serif; font-size: 20px; margin-top: 0; color: #555; text-shadow:none;">Official Assessment Report</h2>
-            <hr style="border: 1px solid #000; margin: 20px 0;">
-            <div style="text-align: left; font-size: 16px; line-height: 1.6; font-family: serif;">
-                <p><strong>Unit Evaluated:</strong> <span id="cert-unit"></span></p>
-                <p><strong>Student Name:</strong> <span id="cert-name"></span></p>
-                <p><strong>Class / Seat No:</strong> <span id="cert-class"></span> / <span id="cert-seat"></span></p>
-                <p><strong>Date:</strong> <span id="cert-date"></span></p>
+    <div id="preview-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="report-content">
+                <div class="report-header">
+                    <h1 style="font-size:28px; margin:0;">Shirley's Interactive iVocab Reader</h1>
+                    <h2 style="font-size:18px; color:#555; margin:5px 0 0 0; font-family:sans-serif;">Comprehensive Assessment Report</h2>
+                </div>
+                
+                <div class="report-details">
+                    <div>
+                        <strong>Student:</strong> <span id="rep-name"></span><br>
+                        <strong>Class/Seat:</strong> <span id="rep-class"></span> / <span id="rep-seat"></span>
+                    </div>
+                    <div style="text-align:right;">
+                        <strong>Date:</strong> <span id="rep-date"></span><br>
+                        <strong>Unit:</strong> <span id="rep-unit"></span>
+                    </div>
+                </div>
+
+                <div style="background:#f9f9f9; padding:15px; text-align:center; border:2px solid #eee; margin-bottom:30px;">
+                    <span style="font-size:14px; color:#666; font-family:sans-serif;">FINAL SCORE</span><br>
+                    <span id="rep-score" style="font-size:48px; font-weight:bold; color:#000;"></span>
+                </div>
+
+                <div class="report-body" id="rep-questions-container">
+                    </div>
+                
+                <div style="margin-top:30px; border-top:1px solid #ddd; padding-top:10px; font-size:10px; color:#999; text-align:center; font-family:sans-serif;">
+                    Generated by iVocab System | Verified Assessment
+                </div>
             </div>
-            <div style="margin: 30px 0; padding: 20px; border: 2px solid #000; background: #f9f9f9; display: inline-block;">
-                <span style="font-size: 24px; font-family: sans-serif; font-weight: bold; color: #000;">FINAL SCORE</span><br>
-                <span id="cert-score" style="font-size: 60px; font-weight: bold; color: #000; font-family: serif;"></span>
+            <div class="modal-actions" data-html2canvas-ignore="true">
+                <button class="btn-download" onclick="generatePDF()">Confirm & Download PDF</button>
+                <button class="btn-close" onclick="closePreviewModal()">Back to Edit</button>
             </div>
-            <p style="font-size: 12px; color: #777; margin-top: 50px;">Verified by iVocab Academic System</p>
         </div>
     </div>
 
@@ -387,7 +303,6 @@
         function initGalaxy() {
             const container = document.getElementById('canvas-container');
             const scene = new THREE.Scene();
-            // Less fog to make it brighter
             scene.fog = new THREE.FogExp2(0x050510, 0.001);
 
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -400,19 +315,16 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(renderer.domElement);
 
-            // Galaxy Logic
             const particlesGeometry = new THREE.BufferGeometry();
             const count = 6000;
             const posArray = new Float32Array(count * 3);
             const colorArray = new Float32Array(count * 3);
-
-            const colorInside = new THREE.Color('#ffcc00'); // Gold Center
-            const colorOutside = new THREE.Color('#1b3984'); // Blue edges
+            const colorInside = new THREE.Color('#ffcc00'); 
+            const colorOutside = new THREE.Color('#1b3984');
 
             for(let i = 0; i < count; i++) {
                 const i3 = i * 3;
                 const radius = Math.random() * 50;
-                // Spiral formula
                 const spinAngle = radius * 0.8;
                 const branchAngle = (i % 3) / 3 * Math.PI * 2;
                 
@@ -421,10 +333,9 @@
                 const randomZ = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.5 * radius;
 
                 posArray[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
-                posArray[i3+1] = randomY * 0.5; // Flattened
+                posArray[i3+1] = randomY * 0.5;
                 posArray[i3+2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
 
-                // Color mixing
                 const mixedColor = colorInside.clone();
                 mixedColor.lerp(colorOutside, radius / 50);
 
@@ -437,34 +348,16 @@
             particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
 
             const particlesMaterial = new THREE.PointsMaterial({
-                size: 0.3,
-                sizeAttenuation: true,
-                depthWrite: false,
-                blending: THREE.AdditiveBlending,
-                vertexColors: true
+                size: 0.3, sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true
             });
 
             const particles = new THREE.Points(particlesGeometry, particlesMaterial);
             scene.add(particles);
 
-            // Add star twinkle background
-            const starsGeom = new THREE.BufferGeometry();
-            const starsCount = 1000;
-            const starsPos = new Float32Array(starsCount * 3);
-            for(let i=0; i<starsCount*3; i++) {
-                starsPos[i] = (Math.random() - 0.5) * 200;
-            }
-            starsGeom.setAttribute('position', new THREE.BufferAttribute(starsPos, 3));
-            const starsMat = new THREE.PointsMaterial({color: 0xffffff, size: 0.1, transparent: true});
-            const stars = new THREE.Points(starsGeom, starsMat);
-            scene.add(stars);
-
-            // Animation
             const clock = new THREE.Clock();
             function animate() {
                 const elapsedTime = clock.getElapsedTime();
                 particles.rotation.y = elapsedTime * 0.05;
-                stars.rotation.y = elapsedTime * 0.01;
                 renderer.render(scene, camera);
                 requestAnimationFrame(animate);
             }
@@ -478,9 +371,8 @@
         }
 
         // --- 2. LOGIC ---
-        const STATE = { allData: [], currentQuestions: [], level: 4 };
+        const STATE = { allData: [], currentQuestions: [], level: 4, userAnswers: {} };
 
-        // Populate Unit Select
         const unitSelect = document.getElementById('unit-select');
         for (let i = 1; i <= 50; i++) {
             const option = document.createElement('option');
@@ -492,9 +384,8 @@
 
         async function fetchData(level) {
             document.getElementById('loader').style.display = 'block';
-            const url = `https://ducj-creator.github.io/iVocab-Readers/L${level}RC.json`;
             try {
-                const res = await fetch(url);
+                const res = await fetch(`https://ducj-creator.github.io/iVocab-Readers/L${level}RC.json`);
                 if (!res.ok) throw new Error("Fetch failed");
                 const data = await res.json();
                 processData(data);
@@ -502,7 +393,7 @@
                 return true;
             } catch (e) {
                 console.error(e);
-                alert("Data loading failed. Please check internet.");
+                alert("Data loading failed.");
                 document.getElementById('loader').style.display = 'none';
                 return false;
             }
@@ -527,9 +418,10 @@
             }
 
             const qs = STATE.allData.filter(q => q.fullUnitName.includes(unitKey));
-            if (qs.length === 0) return alert("No questions found for this unit.");
+            if (qs.length === 0) return alert("No questions found.");
 
             STATE.currentQuestions = qs.sort(() => 0.5 - Math.random()).slice(0, 5);
+            STATE.userAnswers = {}; // Reset answers
             document.getElementById('current-unit-title').textContent = STATE.currentQuestions[0].fullUnitName;
             renderQuestions();
         }
@@ -544,7 +436,6 @@
                 const card = document.createElement('div');
                 card.className = 'question-card';
                 
-                // Regex to force break at A) B) C) D)
                 let text = q.question.replace(/^\d+\.\s*/, '');
                 let parts = text.split(/(?=\s[A-D]\)\s)/);
                 const body = parts[0];
@@ -557,7 +448,7 @@
                     </div>
                     <div class="options-grid">
                         ${['A','B','C','D'].map(opt => `
-                            <label class="option-label" onclick="selectOpt(this)">
+                            <label class="option-label" onclick="selectOpt(this, ${idx}, '${opt}')">
                                 <input type="radio" name="q${idx}" value="${opt}"> ${opt}
                             </label>
                         `).join('')}
@@ -569,7 +460,10 @@
             document.getElementById('quiz-container').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function selectOpt(label) {
+        function selectOpt(label, qIdx, val) {
+            // Save answer to state
+            STATE.userAnswers[qIdx] = val;
+            
             const all = label.parentElement.querySelectorAll('.option-label');
             all.forEach(l => l.classList.remove('checked'));
             label.classList.add('checked');
@@ -578,15 +472,16 @@
 
         function submitQuiz() {
             let score = 0;
-            let answered = 0;
+            let answeredCount = 0;
+            
             STATE.currentQuestions.forEach((q, idx) => {
-                const input = document.querySelector(`input[name="q${idx}"]:checked`);
                 const fb = document.getElementById(`feedback-${idx}`);
                 fb.style.display = 'block';
+                const userVal = STATE.userAnswers[idx];
                 
-                if (input) {
-                    answered++;
-                    const isCorrect = input.value === q.answer.trim().toUpperCase();
+                if (userVal) {
+                    answeredCount++;
+                    const isCorrect = userVal === q.answer.trim().toUpperCase();
                     if (isCorrect) score++;
                     fb.innerHTML = isCorrect ? 
                         `<span class="correct">✓ Correct</span>` : 
@@ -600,7 +495,7 @@
                 labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
             });
 
-            if (answered < 5) if(!confirm("Not all questions answered. Submit anyway?")) return;
+            if (answeredCount < 5) if(!confirm("Not all questions answered. Submit anyway?")) return;
 
             document.getElementById('submit-btn').style.display = 'none';
             document.getElementById('results-container').style.display = 'block';
@@ -614,84 +509,102 @@
             document.getElementById('submit-btn').style.display = 'inline-block';
             document.getElementById('unit-select').value = "";
             ['input-class', 'input-seat', 'input-name'].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('pdf-status').style.display = 'none';
+            STATE.userAnswers = {};
             window.scrollTo({top:0, behavior:'smooth'});
         }
 
-        // --- 3. ROBUST PDF GENERATION (NO JUMPING) ---
-        window.jsPDF = window.jspdf.jsPDF;
-
-        function downloadPDF() {
+        // --- 3. PREVIEW & REPORT GENERATION ---
+        
+        function openPreviewModal() {
             const cls = document.getElementById('input-class').value;
             const seat = document.getElementById('input-seat').value;
             const name = document.getElementById('input-name').value;
-            const score = document.getElementById('final-score').innerText;
-            const unit = document.getElementById('current-unit-title').innerText;
-            const statusEl = document.getElementById('pdf-status');
-
+            
             if(!cls || !seat || !name) {
-                alert("Please enter Name, Class, and Seat No.");
+                alert("Please enter Name, Class, and Seat No. to generate the report.");
                 return;
             }
 
-            statusEl.innerText = "Generating Certificate... Please wait.";
-            statusEl.style.display = 'block';
+            // Fill Basic Info
+            document.getElementById('rep-name').innerText = name;
+            document.getElementById('rep-class').innerText = cls;
+            document.getElementById('rep-seat').innerText = seat;
+            document.getElementById('rep-date').innerText = new Date().toLocaleDateString();
+            document.getElementById('rep-unit').innerText = document.getElementById('current-unit-title').innerText;
+            document.getElementById('rep-score').innerText = document.getElementById('final-score').innerText;
 
-            // 1. Fill the Hidden Template
-            document.getElementById('cert-unit').innerText = unit;
-            document.getElementById('cert-name').innerText = name;
-            document.getElementById('cert-class').innerText = cls;
-            document.getElementById('cert-seat').innerText = seat;
-            document.getElementById('cert-score').innerText = score;
-            document.getElementById('cert-date').innerText = new Date().toLocaleDateString();
+            // Generate Detailed Questions Loop
+            const container = document.getElementById('rep-questions-container');
+            container.innerHTML = "";
 
-            // 2. Clone the template to an off-screen container
-            // This prevents the user's screen from jumping or changing colors
-            const ghost = document.createElement('div');
-            ghost.id = 'certificate-ghost';
-            ghost.innerHTML = document.getElementById('certificate-template').innerHTML;
-            document.body.appendChild(ghost);
+            STATE.currentQuestions.forEach((q, idx) => {
+                const userAns = STATE.userAnswers[idx] || "-";
+                const correctAns = q.answer.trim().toUpperCase();
+                const isCorrect = userAns === correctAns;
 
-            // 3. Capture the ghost element
-            html2canvas(ghost, { scale: 2 }).then(canvas => {
+                // Format Question Text & Options
+                let text = q.question.replace(/^\d+\.\s*/, '');
+                let parts = text.split(/(?=\s[A-D]\)\s)/);
+                const body = parts[0];
+                const opts = parts.slice(1).map(p => p.trim()).join('<br>');
+
+                // Create Status Badge
+                let statusHtml = "";
+                if(isCorrect) {
+                    statusHtml = `<span class="report-status status-correct">✓ Correct (Your Answer: ${userAns})</span>`;
+                } else {
+                    statusHtml = `<span class="report-status status-wrong">✗ Incorrect (Your Answer: ${userAns})</span> 
+                                  <span style="font-size:13px; margin-left:10px;">Correct Answer: <strong>${correctAns}</strong></span>`;
+                }
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'report-q-item';
+                itemDiv.innerHTML = `
+                    <div class="report-q-text">Q${idx+1}. ${body}</div>
+                    <div class="report-options">${opts}</div>
+                    <div style="margin-top:5px;">${statusHtml}</div>
+                `;
+                container.appendChild(itemDiv);
+            });
+
+            // Show Modal
+            document.getElementById('preview-modal').style.display = 'flex';
+        }
+
+        function closePreviewModal() {
+            document.getElementById('preview-modal').style.display = 'none';
+        }
+
+        window.jsPDF = window.jspdf.jsPDF;
+
+        function generatePDF() {
+            const element = document.getElementById('report-content');
+            const name = document.getElementById('input-name').value;
+            const btn = document.querySelector('.btn-download');
+            
+            btn.innerText = "Generating...";
+            btn.disabled = true;
+
+            html2canvas(element, { scale: 2 }).then(canvas => {
                 const imgData = canvas.toDataURL('image/jpeg', 0.95);
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
                 
+                // If content is very long, we might just scale it to fit or let it stretch (Simple approach: Fit Width)
                 pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save(`Certificate_${name}.pdf`);
+                pdf.save(`Full_Report_${name}.pdf`);
                 
-                // Cleanup
-                document.body.removeChild(ghost);
-                statusEl.innerText = "Download started.";
+                btn.innerText = "Confirm & Download PDF";
+                btn.disabled = false;
+                // Optional: Close modal after download
+                // closePreviewModal(); 
             }).catch(err => {
+                alert("Error generating PDF. Please try again.");
                 console.error(err);
-                document.body.removeChild(ghost);
-                statusEl.innerText = "Download blocked by browser. Opening in new tab...";
-                // Fallback: If download fails, try to print
-                alert("Auto-download failed (common in online compilers). Opening Print Dialog instead.");
-                printFallback(); 
+                btn.innerText = "Confirm & Download PDF";
+                btn.disabled = false;
             });
-        }
-
-        // Fallback method using browser print
-        function printFallback() {
-            // Very simple print method
-            const ghost = document.createElement('div');
-            ghost.innerHTML = document.getElementById('certificate-template').innerHTML;
-            ghost.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:white; color:black; z-index:99999; padding:20px;";
-            ghost.id = "print-layer";
-            
-            // Add a close button to the print layer
-            const closeBtn = document.createElement('button');
-            closeBtn.innerText = "Close Print View";
-            closeBtn.onclick = () => document.body.removeChild(ghost);
-            closeBtn.style.cssText = "position:absolute; top:10px; right:10px; padding:10px; background:#ddd; border:1px solid #000; cursor:pointer;";
-            ghost.appendChild(closeBtn);
-
-            document.body.appendChild(ghost);
-            window.print();
         }
 
         initGalaxy();
