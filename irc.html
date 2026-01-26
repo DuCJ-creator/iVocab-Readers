@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shirley's Interactive iVocab Reader</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            /* ULTRA SHINY GOLD PALETTE */
+            --bg-deep: #050510;
+            --glass-bg: rgba(15, 15, 25, 0.85);
+            /* Luxury Gold Gradients */
+            --gold-gradient: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --gold-text: #FDB931; 
+            --gold-border: rgba(255, 215, 0, 0.4);
+            --text-main: #ffffff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-x: hidden;
+            font-family: 'Lato', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+        }
+
+        /* 3D Background Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
+        }
+
+        /* Main UI Container */
+        .app-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 2rem;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: var(--glass-bg);
+            border: 1px solid var(--gold-border);
+            border-radius: 24px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(184, 134, 11, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--gold-border);
+            padding-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            margin: 0;
+            letter-spacing: 1px;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            /* Enhance Shininess */
+            filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.5));
+            animation: shine 5s infinite linear;
+        }
+        
+        @keyframes shine {
+            0% { background-position: 0; }
+            100% { background-position: 1000px; }
+        }
+
+        h2 {
+            font-family: 'Lato', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: #e0e0e0;
+            margin-top: 15px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px rgba(255,255,255,0.3);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        select, input {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--gold-border);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fcf6ba;
+            font-family: 'Lato', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        
+        select:focus, input:focus {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            border-color: #ffd700;
+        }
+
+        button {
+            padding: 12px 30px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            /* Shiny Gold Button */
+            background: linear-gradient(135deg, #b38728, #fcf6ba, #bf953f);
+            color: #1a0500;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            border: 1px solid #ffd700;
+        }
+
+        button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.7);
+        }
+
+        button.secondary {
+            background: transparent;
+            border: 1px solid #fcf6ba;
+            color: #fcf6ba;
+            box-shadow: none;
+        }
+        
+        button.secondary:hover {
+            background: rgba(255, 215, 0, 0.15);
+            color: white;
+        }
+
+        /* Question Cards */
+        .quiz-area { display: none; animation: fadeIn 0.8s ease; }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.04);
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-left: 4px solid #b38728;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-options-block {
+            margin-top: 1.2rem;
+            padding-left: 1.5rem;
+            color: #d1d5db;
+            font-size: 1.15rem;
+            line-height: 2;
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 1.5rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #fcf6ba;
+            font-weight: bold;
+            font-family: 'Cinzel', serif;
+        }
+
+        .option-label:hover {
+            background: rgba(255, 215, 0, 0.25);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .option-label.checked {
+            background: linear-gradient(135deg, #b38728, #fcf6ba);
+            color: #222;
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .option-label input { display: none; }
+
+        /* Feedback */
+        .feedback-container { margin-top: 20px; padding: 15px; border-radius: 8px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);}
+        .correct { color: #4ade80; font-weight: bold; font-size: 1.1rem; text-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }
+        .incorrect { color: #ff6b6b; font-weight: bold; font-size: 1.1rem; text-shadow: 0 0 10px rgba(255, 107, 107, 0.4); }
+
+        /* Results */
+        .results-area { display: none; text-align: center; animation: fadeIn 0.8s ease; }
+        
+        .score-display {
+            font-size: 5rem;
+            font-family: 'Cinzel', serif;
+            /* Gradient Text */
+            background: linear-gradient(to bottom, #ffffbe 0%, #d4af37 50%, #b8860b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 1rem 0;
+            font-weight: bold;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+        }
+
+        .info-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            max-width: 650px;
+            margin: 30px auto;
+            text-align: left;
+            padding: 25px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 16px;
+            border: 1px solid rgba(255,215,0,0.1);
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #fcf6ba;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+        }
+        
+        .input-group input { width: 100%; box-sizing: border-box; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .loader {
+            border: 4px solid rgba(255,215,0,0.1);
+            border-left-color: #ffd700;
+            border-radius: 50%;
+            width: 50px; height: 50px;
+            animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            display: none; margin: 30px auto;
+            box-shadow: 0 0 20px rgba(255,215,0,0.2);
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Styles for the "Ghost" Certificate (Hidden until generation) */
+        #certificate-ghost {
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            width: 800px; /* A4 Ratio width */
+            background: white;
+            color: black;
+            font-family: 'Times New Roman', serif;
+            padding: 40px;
+            border: 10px solid #222;
+            box-sizing: border-box;
+            z-index: 1000;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div class="app-container" id="main-app">
+        <header>
+            <h1>Shirley's Interactive iVocab Reader</h1>
+            <h2>Assess Your Reading Comprehension Anywhere, Anytime</h2>
+        </header>
+
+        <div class="controls">
+            <select id="level-select">
+                <option value="" disabled selected>Select Level</option>
+                <option value="4" selected>Level 4</option>
+                <option value="1" disabled>Level 1 (Coming Soon)</option>
+                <option value="2" disabled>Level 2 (Coming Soon)</option>
+                <option value="3" disabled>Level 3 (Coming Soon)</option>
+                <option value="5" disabled>Level 5 (Coming Soon)</option>
+                <option value="6" disabled>Level 6 (Coming Soon)</option>
+            </select>
+
+            <select id="unit-select">
+                <option value="" disabled selected>Select Unit</option>
+                </select>
+
+            <button onclick="startQuiz()">Start Assessment</button>
+        </div>
+
+        <div class="loader" id="loader"></div>
+
+        <div id="quiz-container" class="quiz-area">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                 <h3 id="current-unit-title" style="color: #fcf6ba; font-family: 'Cinzel'; font-size: 1.8rem; border-bottom: 2px solid #b38728; display:inline-block; padding-bottom:10px; margin-top:0;">Unit Title</h3>
+            </div>
+            
+            <div id="questions-list"></div>
+            
+            <div style="text-align: center; margin-top: 3rem;">
+                <button id="submit-btn" onclick="submitQuiz()" style="font-size: 1.2rem; padding: 15px 60px;">Submit Answers</button>
+            </div>
+        </div>
+
+        <div id="results-container" class="results-area">
+            <h2 style="color: #fcf6ba; font-size: 2rem;">Assessment Complete</h2>
+            <div class="score-display" id="final-score">0 / 5</div>
+            
+            <div class="info-inputs">
+                <div class="input-group">
+                    <label>Class</label>
+                    <input type="text" id="input-class" placeholder="e.g. 10A">
+                </div>
+                <div class="input-group">
+                    <label>Seat No.</label>
+                    <input type="text" id="input-seat" placeholder="e.g. 15">
+                </div>
+                <div class="input-group">
+                    <label>Name</label>
+                    <input type="text" id="input-name" placeholder="Student Name">
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="downloadPDF()">Download Certified PDF</button>
+                <button class="secondary" onclick="resetApp()">New Quiz</button>
+            </div>
+            <p id="pdf-status" style="margin-top:10px; font-size:0.9rem; color:#aaa; display:none;"></p>
+        </div>
+    </div>
+
+    <div id="certificate-template" style="display:none;">
+        <div style="border: 5px double #000; padding: 20px; height: 100%; box-sizing: border-box; text-align: center;">
+            <h1 style="font-family: serif; font-size: 36px; margin-bottom: 5px; color: #000; text-shadow:none;">Shirley's Interactive iVocab Reader</h1>
+            <h2 style="font-family: sans-serif; font-size: 20px; margin-top: 0; color: #555; text-shadow:none;">Official Assessment Report</h2>
+            <hr style="border: 1px solid #000; margin: 20px 0;">
+            <div style="text-align: left; font-size: 16px; line-height: 1.6; font-family: serif;">
+                <p><strong>Unit Evaluated:</strong> <span id="cert-unit"></span></p>
+                <p><strong>Student Name:</strong> <span id="cert-name"></span></p>
+                <p><strong>Class / Seat No:</strong> <span id="cert-class"></span> / <span id="cert-seat"></span></p>
+                <p><strong>Date:</strong> <span id="cert-date"></span></p>
+            </div>
+            <div style="margin: 30px 0; padding: 20px; border: 2px solid #000; background: #f9f9f9; display: inline-block;">
+                <span style="font-size: 24px; font-family: sans-serif; font-weight: bold; color: #000;">FINAL SCORE</span><br>
+                <span id="cert-score" style="font-size: 60px; font-weight: bold; color: #000; font-family: serif;"></span>
+            </div>
+            <p style="font-size: 12px; color: #777; margin-top: 50px;">Verified by iVocab Academic System</p>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Three.js BRIGHT GALAXY ---
+        function initGalaxy() {
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            // Less fog to make it brighter
+            scene.fog = new THREE.FogExp2(0x050510, 0.001);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 40; 
+            camera.position.y = 20;
+            camera.lookAt(0, 0, 0);
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Galaxy Logic
+            const particlesGeometry = new THREE.BufferGeometry();
+            const count = 6000;
+            const posArray = new Float32Array(count * 3);
+            const colorArray = new Float32Array(count * 3);
+
+            const colorInside = new THREE.Color('#ffcc00'); // Gold Center
+            const colorOutside = new THREE.Color('#1b3984'); // Blue edges
+
+            for(let i = 0; i < count; i++) {
+                const i3 = i * 3;
+                const radius = Math.random() * 50;
+                // Spiral formula
+                const spinAngle = radius * 0.8;
+                const branchAngle = (i % 3) / 3 * Math.PI * 2;
+                
+                const randomX = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.5 * radius;
+                const randomY = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.5 * radius;
+                const randomZ = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.5 * radius;
+
+                posArray[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+                posArray[i3+1] = randomY * 0.5; // Flattened
+                posArray[i3+2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+
+                // Color mixing
+                const mixedColor = colorInside.clone();
+                mixedColor.lerp(colorOutside, radius / 50);
+
+                colorArray[i3] = mixedColor.r;
+                colorArray[i3+1] = mixedColor.g;
+                colorArray[i3+2] = mixedColor.b;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.3,
+                sizeAttenuation: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending,
+                vertexColors: true
+            });
+
+            const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+
+            // Add star twinkle background
+            const starsGeom = new THREE.BufferGeometry();
+            const starsCount = 1000;
+            const starsPos = new Float32Array(starsCount * 3);
+            for(let i=0; i<starsCount*3; i++) {
+                starsPos[i] = (Math.random() - 0.5) * 200;
+            }
+            starsGeom.setAttribute('position', new THREE.BufferAttribute(starsPos, 3));
+            const starsMat = new THREE.PointsMaterial({color: 0xffffff, size: 0.1, transparent: true});
+            const stars = new THREE.Points(starsGeom, starsMat);
+            scene.add(stars);
+
+            // Animation
+            const clock = new THREE.Clock();
+            function animate() {
+                const elapsedTime = clock.getElapsedTime();
+                particles.rotation.y = elapsedTime * 0.05;
+                stars.rotation.y = elapsedTime * 0.01;
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // --- 2. LOGIC ---
+        const STATE = { allData: [], currentQuestions: [], level: 4 };
+
+        // Populate Unit Select
+        const unitSelect = document.getElementById('unit-select');
+        for (let i = 1; i <= 50; i++) {
+            const option = document.createElement('option');
+            option.value = `Unit ${i}`;
+            option.textContent = `Unit ${i}`;
+            if (i < 36) { option.disabled = true; option.textContent += " (Unavailable)"; }
+            unitSelect.appendChild(option);
+        }
+
+        async function fetchData(level) {
+            document.getElementById('loader').style.display = 'block';
+            const url = `https://ducj-creator.github.io/iVocab-Readers/L${level}RC.json`;
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error("Fetch failed");
+                const data = await res.json();
+                processData(data);
+                document.getElementById('loader').style.display = 'none';
+                return true;
+            } catch (e) {
+                console.error(e);
+                alert("Data loading failed. Please check internet.");
+                document.getElementById('loader').style.display = 'none';
+                return false;
+            }
+        }
+
+        function processData(data) {
+            let lastUnit = "";
+            STATE.allData = data.map(item => {
+                if (item.unit && item.unit.trim() !== "") lastUnit = item.unit;
+                return { ...item, fullUnitName: lastUnit, unitKey: lastUnit.split(':')[0] };
+            });
+        }
+
+        async function startQuiz() {
+            const level = document.getElementById('level-select').value;
+            const unitKey = document.getElementById('unit-select').value;
+            if (!level || !unitKey) return alert("Please select Level and Unit.");
+
+            if (STATE.allData.length === 0) {
+                const success = await fetchData(level);
+                if (!success) return;
+            }
+
+            const qs = STATE.allData.filter(q => q.fullUnitName.includes(unitKey));
+            if (qs.length === 0) return alert("No questions found for this unit.");
+
+            STATE.currentQuestions = qs.sort(() => 0.5 - Math.random()).slice(0, 5);
+            document.getElementById('current-unit-title').textContent = STATE.currentQuestions[0].fullUnitName;
+            renderQuestions();
+        }
+
+        function renderQuestions() {
+            const list = document.getElementById('questions-list');
+            list.innerHTML = "";
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('results-container').style.display = 'none';
+
+            STATE.currentQuestions.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                
+                // Regex to force break at A) B) C) D)
+                let text = q.question.replace(/^\d+\.\s*/, '');
+                let parts = text.split(/(?=\s[A-D]\)\s)/);
+                const body = parts[0];
+                const opts = parts.slice(1).map(p => p.trim()).join('<br>');
+
+                card.innerHTML = `
+                    <div class="question-text">
+                        <strong style="color:var(--gold-text)">Q${idx+1}.</strong> ${body}
+                        <div class="question-options-block">${opts}</div>
+                    </div>
+                    <div class="options-grid">
+                        ${['A','B','C','D'].map(opt => `
+                            <label class="option-label" onclick="selectOpt(this)">
+                                <input type="radio" name="q${idx}" value="${opt}"> ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="feedback-${idx}" class="feedback-container" style="display:none"></div>
+                `;
+                list.appendChild(card);
+            });
+            document.getElementById('quiz-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function selectOpt(label) {
+            const all = label.parentElement.querySelectorAll('.option-label');
+            all.forEach(l => l.classList.remove('checked'));
+            label.classList.add('checked');
+            label.querySelector('input').checked = true;
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            let answered = 0;
+            STATE.currentQuestions.forEach((q, idx) => {
+                const input = document.querySelector(`input[name="q${idx}"]:checked`);
+                const fb = document.getElementById(`feedback-${idx}`);
+                fb.style.display = 'block';
+                
+                if (input) {
+                    answered++;
+                    const isCorrect = input.value === q.answer.trim().toUpperCase();
+                    if (isCorrect) score++;
+                    fb.innerHTML = isCorrect ? 
+                        `<span class="correct">✓ Correct</span>` : 
+                        `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
+                } else {
+                    fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
+                }
+                
+                // Disable interactions
+                const labels = document.querySelectorAll(`input[name="q${idx}"]`);
+                labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
+            });
+
+            if (answered < 5) if(!confirm("Not all questions answered. Submit anyway?")) return;
+
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('results-container').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score} / 5`;
+            document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetApp() {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('results-container').style.display = 'none';
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            document.getElementById('unit-select').value = "";
+            ['input-class', 'input-seat', 'input-name'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('pdf-status').style.display = 'none';
+            window.scrollTo({top:0, behavior:'smooth'});
+        }
+
+        // --- 3. ROBUST PDF GENERATION (NO JUMPING) ---
+        window.jsPDF = window.jspdf.jsPDF;
+
+        function downloadPDF() {
+            const cls = document.getElementById('input-class').value;
+            const seat = document.getElementById('input-seat').value;
+            const name = document.getElementById('input-name').value;
+            const score = document.getElementById('final-score').innerText;
+            const unit = document.getElementById('current-unit-title').innerText;
+            const statusEl = document.getElementById('pdf-status');
+
+            if(!cls || !seat || !name) {
+                alert("Please enter Name, Class, and Seat No.");
+                return;
+            }
+
+            statusEl.innerText = "Generating Certificate... Please wait.";
+            statusEl.style.display = 'block';
+
+            // 1. Fill the Hidden Template
+            document.getElementById('cert-unit').innerText = unit;
+            document.getElementById('cert-name').innerText = name;
+            document.getElementById('cert-class').innerText = cls;
+            document.getElementById('cert-seat').innerText = seat;
+            document.getElementById('cert-score').innerText = score;
+            document.getElementById('cert-date').innerText = new Date().toLocaleDateString();
+
+            // 2. Clone the template to an off-screen container
+            // This prevents the user's screen from jumping or changing colors
+            const ghost = document.createElement('div');
+            ghost.id = 'certificate-ghost';
+            ghost.innerHTML = document.getElementById('certificate-template').innerHTML;
+            document.body.appendChild(ghost);
+
+            // 3. Capture the ghost element
+            html2canvas(ghost, { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(`Certificate_${name}.pdf`);
+                
+                // Cleanup
+                document.body.removeChild(ghost);
+                statusEl.innerText = "Download started.";
+            }).catch(err => {
+                console.error(err);
+                document.body.removeChild(ghost);
+                statusEl.innerText = "Download blocked by browser. Opening in new tab...";
+                // Fallback: If download fails, try to print
+                alert("Auto-download failed (common in online compilers). Opening Print Dialog instead.");
+                printFallback(); 
+            });
+        }
+
+        // Fallback method using browser print
+        function printFallback() {
+            // Very simple print method
+            const ghost = document.createElement('div');
+            ghost.innerHTML = document.getElementById('certificate-template').innerHTML;
+            ghost.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:white; color:black; z-index:99999; padding:20px;";
+            ghost.id = "print-layer";
+            
+            // Add a close button to the print layer
+            const closeBtn = document.createElement('button');
+            closeBtn.innerText = "Close Print View";
+            closeBtn.onclick = () => document.body.removeChild(ghost);
+            closeBtn.style.cssText = "position:absolute; top:10px; right:10px; padding:10px; background:#ddd; border:1px solid #000; cursor:pointer;";
+            ghost.appendChild(closeBtn);
+
+            document.body.appendChild(ghost);
+            window.print();
+        }
+
+        initGalaxy();
+    </script>
+</body>
+</html>
