@@ -519,6 +519,7 @@
             const cls = document.getElementById('input-class').value;
             const seat = document.getElementById('input-seat').value;
             const name = document.getElementById('input-name').value;
+            const level = document.getElementById('level-select').value;
             
             if(!cls || !seat || !name) {
                 alert("Please enter Name, Class, and Seat No. to generate the report.");
@@ -530,7 +531,11 @@
             document.getElementById('rep-class').innerText = cls;
             document.getElementById('rep-seat').innerText = seat;
             document.getElementById('rep-date').innerText = new Date().toLocaleDateString();
-            document.getElementById('rep-unit').innerText = document.getElementById('current-unit-title').innerText;
+            
+            // COMBINED LEVEL AND UNIT HERE
+            const unitTitle = document.getElementById('current-unit-title').innerText;
+            document.getElementById('rep-unit').innerText = `Level ${level} | ${unitTitle}`;
+            
             document.getElementById('rep-score').innerText = document.getElementById('final-score').innerText;
 
             // Generate Detailed Questions Loop
@@ -591,14 +596,11 @@
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
                 
-                // If content is very long, we might just scale it to fit or let it stretch (Simple approach: Fit Width)
                 pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
                 pdf.save(`Full_Report_${name}.pdf`);
                 
                 btn.innerText = "Confirm & Download PDF";
                 btn.disabled = false;
-                // Optional: Close modal after download
-                // closePreviewModal(); 
             }).catch(err => {
                 alert("Error generating PDF. Please try again.");
                 console.error(err);
