@@ -205,8 +205,10 @@
         <div class="controls">
             <select id="level-select" onchange="handleLevelChange()">
                 <option value="" disabled selected>Select Level</option>
-                <option value="1">Level 1</option> <option value="2" disabled>Level 2 (Coming Soon)</option>
-                <option value="3">Level 3</option> <option value="4">Level 4</option>
+                <option value="1">Level 1</option>
+                <option value="2" disabled>Level 2 (Coming Soon)</option>
+                <option value="3">Level 3</option>
+                <option value="4">Level 4</option>
                 <option value="5" disabled>Level 5 (Coming Soon)</option>
                 <option value="6" disabled>Level 6 (Coming Soon)</option>
             </select>
@@ -371,18 +373,16 @@
         // --- 2. LOGIC ---
         const STATE = { allData: [], currentQuestions: [], level: null, userAnswers: {} };
 
-        // Populate Unit Select - ENABLED ALL 50 UNITS
+        // Populate Unit Select
         const unitSelect = document.getElementById('unit-select');
         for (let i = 1; i <= 50; i++) {
             const option = document.createElement('option');
             option.value = `Unit ${i}`;
             option.textContent = `Unit ${i}`;
-            // Removed disabled logic - all units now available
             unitSelect.appendChild(option);
         }
 
         function handleLevelChange() {
-            // When level changes, clear the data so we don't mix Level 4 units with Level 1
             STATE.allData = [];
             STATE.level = document.getElementById('level-select').value;
             console.log("Level changed to:", STATE.level);
@@ -391,7 +391,6 @@
         async function fetchData(level) {
             document.getElementById('loader').style.display = 'block';
             try {
-                // Dynamic URL based on selected level
                 const url = `https://ducj-creator.github.io/iVocab-Readers/L${level}RC.json`;
                 console.log("Fetching from:", url);
                 const res = await fetch(url);
@@ -411,36 +410,51 @@
         function processData(data) {
             let lastUnit = "";
             STATE.allData = data.map(item => {
-                // Handle cases where unit name might be missing in subsequent rows of same unit
-                if (item.unit && item.unit.trim() !== "") lastUnit = item.unit;
-                return { ...item, fullUnitName: lastUnit, unitKey: lastUnit.split(':')[0] };
+                // Ensure item.unit is a valid string before checking
+                if (item.unit && typeof item.unit === 'string' && item.unit.trim().length > 0) {
+                    lastUnit = item.unit;
+                }
+                
+                // EXTRACT NUMBER from the unit string for safer matching
+                // Matches "Unit 36", "Unit 36:", "Unit 05" etc.
+                const match = lastUnit.match(/Unit\s*(\d+)/i);
+                const uNum = match ? parseInt(match[1]) : null;
+
+                return { 
+                    ...item, 
+                    fullUnitName: lastUnit, 
+                    uNum: uNum // Store the clean number
+                };
             });
         }
 
         async function startQuiz() {
             const level = document.getElementById('level-select').value;
-            const unitKey = document.getElementById('unit-select').value;
+            const unitVal = document.getElementById('unit-select').value; // e.g., "Unit 36"
             
             if (!level) return alert("Please select a Level first.");
-            if (!unitKey) return alert("Please select a Unit.");
+            if (!unitVal) return alert("Please select a Unit.");
 
-            // If data is empty OR level changed and we haven't re-fetched
+            // Extract number from selection
+            const selMatch = unitVal.match(/(\d+)/);
+            if (!selMatch) return alert("Invalid Unit Selection");
+            const targetNum = parseInt(selMatch[0]);
+
             if (STATE.allData.length === 0) {
                 const success = await fetchData(level);
                 if (!success) return;
             }
 
-            // Filter questions
-            // Note: Some JSONs might use "Unit 1" vs "Unit 01", simple include check usually works
-            const qs = STATE.allData.filter(q => q.fullUnitName && q.fullUnitName.includes(unitKey));
+            // FILTER BY NUMBER INSTEAD OF STRING
+            const qs = STATE.allData.filter(q => q.uNum === targetNum);
             
             if (qs.length === 0) {
-                alert(`No questions found for ${unitKey} in Level ${level}.`);
+                alert(`No questions found for Unit ${targetNum} in Level ${level}.`);
                 return;
             }
 
             STATE.currentQuestions = qs.sort(() => 0.5 - Math.random()).slice(0, 5);
-            STATE.userAnswers = {}; // Reset answers
+            STATE.userAnswers = {}; 
             document.getElementById('current-unit-title').textContent = STATE.currentQuestions[0].fullUnitName;
             renderQuestions();
         }
@@ -480,9 +494,7 @@
         }
 
         function selectOpt(label, qIdx, val) {
-            // Save answer to state
             STATE.userAnswers[qIdx] = val;
-            
             const all = label.parentElement.querySelectorAll('.option-label');
             all.forEach(l => l.classList.remove('checked'));
             label.classList.add('checked');
@@ -509,7 +521,6 @@
                     fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
                 }
                 
-                // Disable interactions
                 const labels = document.querySelectorAll(`input[name="q${idx}"]`);
                 labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
             });
@@ -533,7 +544,6 @@
         }
 
         // --- 3. PREVIEW & REPORT GENERATION ---
-        
         function openPreviewModal() {
             const cls = document.getElementById('input-class').value;
             const seat = document.getElementById('input-seat').value;
@@ -545,19 +555,15 @@
                 return;
             }
 
-            // Fill Basic Info
             document.getElementById('rep-name').innerText = name;
             document.getElementById('rep-class').innerText = cls;
             document.getElementById('rep-seat').innerText = seat;
             document.getElementById('rep-date').innerText = new Date().toLocaleDateString();
             
-            // COMBINED LEVEL AND UNIT
             const unitTitle = document.getElementById('current-unit-title').innerText;
             document.getElementById('rep-unit').innerText = `Level ${level} | ${unitTitle}`;
-            
             document.getElementById('rep-score').innerText = document.getElementById('final-score').innerText;
 
-            // Generate Detailed Questions Loop
             const container = document.getElementById('rep-questions-container');
             container.innerHTML = "";
 
@@ -566,13 +572,11 @@
                 const correctAns = q.answer.trim().toUpperCase();
                 const isCorrect = userAns === correctAns;
 
-                // Format Question Text & Options
                 let text = q.question.replace(/^\d+\.\s*/, '');
                 let parts = text.split(/(?=\s[A-D]\)\s)/);
                 const body = parts[0];
                 const opts = parts.slice(1).map(p => p.trim()).join('<br>');
 
-                // Create Status Badge
                 let statusHtml = "";
                 if(isCorrect) {
                     statusHtml = `<span class="report-status status-correct">✓ Correct (Your Answer: ${userAns})</span>`;
@@ -591,7 +595,6 @@
                 container.appendChild(itemDiv);
             });
 
-            // Show Modal
             document.getElementById('preview-modal').style.display = 'flex';
         }
 
