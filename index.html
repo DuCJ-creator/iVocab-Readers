@@ -415,9 +415,9 @@
                     lastUnit = item.unit;
                 }
                 
-                // EXTRACT NUMBER from the unit string for safer matching
-                // Matches "Unit 36", "Unit 36:", "Unit 05" etc.
-                const match = lastUnit.match(/Unit\s*(\d+)/i);
+                // --- FIXED REGEX TO HANDLE "U36" AND "Unit 36" ---
+                // Looks for "Unit" OR "U", followed by optional whitespace and digits
+                const match = lastUnit.match(/(?:Unit|U)\s*(\d+)/i);
                 const uNum = match ? parseInt(match[1]) : null;
 
                 return { 
