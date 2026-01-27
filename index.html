@@ -199,7 +199,7 @@
     <div class="app-container" id="main-app">
         <header>
             <h1>Shirley's Interactive iVocab Reader</h1>
-            <h2>Assess Your Leveled Reading Comprehension Anywhere, Anytime</h2>
+            <h2>Assess Your Reading Comprehension Anywhere, Anytime</h2>
         </header>
 
         <div class="controls">
@@ -470,7 +470,11 @@
                 card.className = 'question-card';
                 
                 let text = q.question.replace(/^\d+\.\s*/, '');
-                let parts = text.split(/(?=\s[A-D]\)\s)/);
+                
+                // --- FIXED SPLIT LOGIC FOR LEVEL 1 (NO SPACES) ---
+                // Checks for A) B) C) D) with optional whitespace before them
+                let parts = text.split(/(?=\s*[A-D]\))/);
+                
                 const body = parts[0];
                 const opts = parts.slice(1).map(p => p.trim()).join('<br>');
 
@@ -573,7 +577,10 @@
                 const isCorrect = userAns === correctAns;
 
                 let text = q.question.replace(/^\d+\.\s*/, '');
-                let parts = text.split(/(?=\s[A-D]\)\s)/);
+                
+                // --- FIXED SPLIT LOGIC HERE TOO ---
+                let parts = text.split(/(?=\s*[A-D]\))/);
+                
                 const body = parts[0];
                 const opts = parts.slice(1).map(p => p.trim()).join('<br>');
 
