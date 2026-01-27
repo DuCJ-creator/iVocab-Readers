@@ -199,16 +199,14 @@
     <div class="app-container" id="main-app">
         <header>
             <h1>Shirley's Interactive iVocab Reader</h1>
-            <h2>Assess Your Leveled Reading Comprehension Anywhere, Anytime</h2>
+            <h2>Assess Your Reading Comprehension Anywhere, Anytime</h2>
         </header>
 
         <div class="controls">
-            <select id="level-select">
+            <select id="level-select" onchange="handleLevelChange()">
                 <option value="" disabled selected>Select Level</option>
-                <option value="4" selected>Level 4</option>
-                <option value="1" disabled>Level 1 (Coming Soon)</option>
-                <option value="2" disabled>Level 2 (Coming Soon)</option>
-                <option value="3" disabled>Level 3 (Coming Soon)</option>
+                <option value="1">Level 1</option> <option value="2" disabled>Level 2 (Coming Soon)</option>
+                <option value="3">Level 3</option> <option value="4">Level 4</option>
                 <option value="5" disabled>Level 5 (Coming Soon)</option>
                 <option value="6" disabled>Level 6 (Coming Soon)</option>
             </select>
@@ -371,21 +369,32 @@
         }
 
         // --- 2. LOGIC ---
-        const STATE = { allData: [], currentQuestions: [], level: 4, userAnswers: {} };
+        const STATE = { allData: [], currentQuestions: [], level: null, userAnswers: {} };
 
+        // Populate Unit Select - ENABLED ALL 50 UNITS
         const unitSelect = document.getElementById('unit-select');
         for (let i = 1; i <= 50; i++) {
             const option = document.createElement('option');
             option.value = `Unit ${i}`;
             option.textContent = `Unit ${i}`;
-            if (i < 36) { option.disabled = true; option.textContent += " (Unavailable)"; }
+            // Removed disabled logic - all units now available
             unitSelect.appendChild(option);
+        }
+
+        function handleLevelChange() {
+            // When level changes, clear the data so we don't mix Level 4 units with Level 1
+            STATE.allData = [];
+            STATE.level = document.getElementById('level-select').value;
+            console.log("Level changed to:", STATE.level);
         }
 
         async function fetchData(level) {
             document.getElementById('loader').style.display = 'block';
             try {
-                const res = await fetch(`https://ducj-creator.github.io/iVocab-Readers/L${level}RC.json`);
+                // Dynamic URL based on selected level
+                const url = `https://ducj-creator.github.io/iVocab-Readers/L${level}RC.json`;
+                console.log("Fetching from:", url);
+                const res = await fetch(url);
                 if (!res.ok) throw new Error("Fetch failed");
                 const data = await res.json();
                 processData(data);
@@ -393,7 +402,7 @@
                 return true;
             } catch (e) {
                 console.error(e);
-                alert("Data loading failed.");
+                alert(`Could not load data for Level ${level}. Please check internet connection.`);
                 document.getElementById('loader').style.display = 'none';
                 return false;
             }
@@ -402,6 +411,7 @@
         function processData(data) {
             let lastUnit = "";
             STATE.allData = data.map(item => {
+                // Handle cases where unit name might be missing in subsequent rows of same unit
                 if (item.unit && item.unit.trim() !== "") lastUnit = item.unit;
                 return { ...item, fullUnitName: lastUnit, unitKey: lastUnit.split(':')[0] };
             });
@@ -410,15 +420,24 @@
         async function startQuiz() {
             const level = document.getElementById('level-select').value;
             const unitKey = document.getElementById('unit-select').value;
-            if (!level || !unitKey) return alert("Please select Level and Unit.");
+            
+            if (!level) return alert("Please select a Level first.");
+            if (!unitKey) return alert("Please select a Unit.");
 
+            // If data is empty OR level changed and we haven't re-fetched
             if (STATE.allData.length === 0) {
                 const success = await fetchData(level);
                 if (!success) return;
             }
 
-            const qs = STATE.allData.filter(q => q.fullUnitName.includes(unitKey));
-            if (qs.length === 0) return alert("No questions found.");
+            // Filter questions
+            // Note: Some JSONs might use "Unit 1" vs "Unit 01", simple include check usually works
+            const qs = STATE.allData.filter(q => q.fullUnitName && q.fullUnitName.includes(unitKey));
+            
+            if (qs.length === 0) {
+                alert(`No questions found for ${unitKey} in Level ${level}.`);
+                return;
+            }
 
             STATE.currentQuestions = qs.sort(() => 0.5 - Math.random()).slice(0, 5);
             STATE.userAnswers = {}; // Reset answers
@@ -532,7 +551,7 @@
             document.getElementById('rep-seat').innerText = seat;
             document.getElementById('rep-date').innerText = new Date().toLocaleDateString();
             
-            // COMBINED LEVEL AND UNIT HERE
+            // COMBINED LEVEL AND UNIT
             const unitTitle = document.getElementById('current-unit-title').innerText;
             document.getElementById('rep-unit').innerText = `Level ${level} | ${unitTitle}`;
             
