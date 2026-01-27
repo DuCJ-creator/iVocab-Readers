@@ -86,7 +86,7 @@
  },
  {
    "unit": "",
-   "question": "What \"question\" did Lily have during the journey?A) How long the drive wasB) How the trees were planted and grownC) Where the sea was0) What the guide's name was",
+   "question": "What \"question\" did Lily have during the journey?A) How long the drive wasB) How the trees were planted and grownC) Where the sea was D) What the guide's name was",
    "answer": "B"
  },
  {
@@ -101,7 +101,7 @@
  },
  {
    "unit": "Unit 2: A Story behind a Haircut",
-   "question": "What was Jake's \"strong\" trait?A) MusclesB) VoiceC) Character0) Knowledge",
+   "question": "What was Jake's \"strong\" trait?A) MusclesB) VoiceC) Character D) Knowledge",
    "answer": "C"
  },
  {
@@ -361,7 +361,7 @@
  },
  {
    "unit": "",
-   "question": "What does \"Thus\" indicate in the third paragraph?A) A contrast0) A time sequenceC) A reason or resultD) A location",
+   "question": "What does \"Thus\" indicate in the third paragraph?A) A contrast B) A time sequenceC) A reason or resultD) A location",
    "answer": "C"
  },
  {
@@ -5000,3 +5000,4 @@
    "answer": "D"
  }
 ]
+
