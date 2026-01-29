@@ -505,37 +505,58 @@
             label.querySelector('input').checked = true;
         }
 
-        function submitQuiz() {
-            let score = 0;
-            let answeredCount = 0;
-            
-            STATE.currentQuestions.forEach((q, idx) => {
-                const fb = document.getElementById(`feedback-${idx}`);
-                fb.style.display = 'block';
-                const userVal = STATE.userAnswers[idx];
-                
-                if (userVal) {
-                    answeredCount++;
-                    const isCorrect = userVal === q.answer.trim().toUpperCase();
-                    if (isCorrect) score++;
-                    fb.innerHTML = isCorrect ? 
-                        `<span class="correct">✓ Correct</span>` : 
-                        `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
-                } else {
-                    fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
-                }
-                
-                const labels = document.querySelectorAll(`input[name="q${idx}"]`);
-                labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
-            });
-
-            if (answeredCount < 5) if(!confirm("Not all questions answered. Submit anyway?")) return;
-
-            document.getElementById('submit-btn').style.display = 'none';
-            document.getElementById('results-container').style.display = 'block';
-            document.getElementById('final-score').textContent = `${score} / 5`;
-            document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+       function submitQuiz() {
+    let score = 0;
+    let answeredCount = 0;
+    
+    STATE.currentQuestions.forEach((q, idx) => {
+        const fb = document.getElementById(`feedback-${idx}`);
+        fb.style.display = 'block';
+        const userVal = STATE.userAnswers[idx];
+        
+        if (userVal) {
+            answeredCount++;
+            const isCorrect = userVal === q.answer.trim().toUpperCase();
+            if (isCorrect) score++;
+            fb.innerHTML = isCorrect ? 
+                `<span class="correct">✓ Correct</span>` : 
+                `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
+        } else {
+            fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
         }
+        
+        const labels = document.querySelectorAll(`input[name="q${idx}"]`);
+        labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
+    });
+
+    if (answeredCount < 5) if(!confirm("Not all questions answered. Submit anyway?")) return;
+
+    // --- 關鍵增加：將正確題數 score 回傳至月光寶盒 (使用您原來的欄位名稱) ---
+    if (typeof auth !== 'undefined' && auth.currentUser) {
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        const earnedGlow = score; 
+
+        if (earnedGlow > 0) {
+            updateDoc(userRef, {
+                "moonGlowTotal": increment(earnedGlow),
+                "moonGlowLogs": arrayUnion({
+                    id: Date.now(),
+                    action: "Mission 3: iVocab Reader 閱讀理解",
+                    change: `+${earnedGlow}`,
+                    time: new Date().toLocaleString()
+                })
+            }).then(() => {
+                console.log("Mission 3 分數已成功收集！");
+            });
+        }
+    }
+    // ------------------------------------------------------------------
+
+    document.getElementById('submit-btn').style.display = 'none';
+    document.getElementById('results-container').style.display = 'block';
+    document.getElementById('final-score').textContent = `${score} / 5`;
+    document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+}
 
         function resetApp() {
             document.getElementById('quiz-container').style.display = 'none';
