@@ -659,6 +659,23 @@
         }
 
         initGalaxy();
+        // 讓 Mission 3 具備收集點數的能力
+function collectMoonlight() {
+    if (window.parent) {
+        window.parent.postMessage({
+            type: "missionComplete",
+            missionId: 3 // 對應月光寶盒中的 Mission 3
+        }, "*");
+        console.log("Moonlight point sent!");
+    }
+}
+
+// 修改您原有的 generatePDF 函數，在下載時順便給點數
+const originalGeneratePDF = generatePDF;
+generatePDF = function() {
+    collectMoonlight(); // 觸發收集月光
+    originalGeneratePDF();
+};
     </script>
 </body>
 </html>
