@@ -190,6 +190,33 @@
         .btn-download { background: #000; color: #fff; border: none; }
         .btn-close { background: #fff; color: #000; border: 1px solid #000; }
 
+        /* Moon Glow Notification */
+        .moon-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #0b1333, #05060d);
+            color: #f1c40f;
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 2px solid #f1c40f;
+            box-shadow: 0 0 25px rgba(241, 196, 15, 0.6);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-in 2.5s forwards;
+            font-family: 'Cinzel', serif;
+            max-width: 300px;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(100%); }
+        }
+
     </style>
 </head>
 <body>
@@ -297,6 +324,64 @@
             </div>
         </div>
     </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged,
+            setPersistence,
+            browserLocalPersistence 
+        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc,
+            setDoc,
+            updateDoc,
+            arrayUnion,
+            increment 
+        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        // Firebase 配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyCta1_RddjhYBA437cl8Wg1kGW_bsVimK8",
+            authDomain: "teacher-shirley.firebaseapp.com",
+            databaseURL: "https://teacher-shirley-default-rtdb.firebaseio.com",
+            projectId: "teacher-shirley",
+            storageBucket: "teacher-shirley.firebasestorage.app",
+            messagingSenderId: "534843195436",
+            appId: "1:534843195436:web:f1f873e6f6e8c257ce9189"
+        };
+
+        // 初始化 Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // 設置持久化
+        setPersistence(auth, browserLocalPersistence);
+
+        // 將 Firebase 變量設為全局，以便其他函數使用
+        window.auth = auth;
+        window.db = db;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.arrayUnion = arrayUnion;
+        window.increment = increment;
+        
+        // 監聽登入狀態
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("User is signed in:", user.uid);
+                window.currentUser = user;
+            } else {
+                console.log("User is signed out");
+                window.currentUser = null;
+            }
+        });
+    </script>
 
     <script>
         // --- 1. Three.js BRIGHT GALAXY ---
@@ -505,59 +590,128 @@
             label.querySelector('input').checked = true;
         }
 
-function submitQuiz() {
-    let score = 0;
-    let answeredCount = 0;
-    
-    STATE.currentQuestions.forEach((q, idx) => {
-        const fb = document.getElementById(`feedback-${idx}`);
-        fb.style.display = 'block';
-        const userVal = STATE.userAnswers[idx];
-        
-        if (userVal) {
-            answeredCount++;
-            const isCorrect = userVal === q.answer.trim().toUpperCase();
-            if (isCorrect) score++;
-            fb.innerHTML = isCorrect ? 
-                `<span class="correct">✓ Correct</span>` : 
-                `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
-        } else {
-            fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
+        // 顯示月光收集通知
+        function showMoonGlowNotification(glowPoints) {
+            const notification = document.createElement('div');
+            notification.className = 'moon-notification';
+            notification.innerHTML = `
+                <span style="font-size: 24px;">🌙</span>
+                <div>
+                    <strong>月光收集成功！</strong><br>
+                    <span style="font-size: 12px; color: #7ed6ff;">獲得 ${glowPoints} 點月光</span>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            
+            // 3秒後自動移除
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
         }
-        
-        const labels = document.querySelectorAll(`input[name="q${idx}"]`);
-        labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
-    });
 
-    if (answeredCount < 5) if(!confirm("Not all questions answered. Submit anyway?")) return;
-
-    // --- 關鍵修正：寫入正確的原始欄位名稱 ---
-    if (typeof auth !== 'undefined' && auth.currentUser) {
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        const earnedGlow = score; 
-
-        if (earnedGlow > 0) {
-            updateDoc(userRef, {
-                // 必須與您的原始欄位名稱一致
-                "moonGlowTotal": increment(earnedGlow),
-                "moonGlowLogs": arrayUnion({
-                    id: Date.now(),
-                    action: "Mission 3: iVocab Reader 成功",
-                    change: `+${earnedGlow}`,
-                    time: new Date().toLocaleString()
-                })
-            }).then(() => {
-                console.log("Mission 3 分數已成功收集到月光寶盒");
+        async function submitQuiz() {
+            let score = 0;
+            let answeredCount = 0;
+            
+            STATE.currentQuestions.forEach((q, idx) => {
+                const fb = document.getElementById(`feedback-${idx}`);
+                fb.style.display = 'block';
+                const userVal = STATE.userAnswers[idx];
+                
+                if (userVal) {
+                    answeredCount++;
+                    const isCorrect = userVal === q.answer.trim().toUpperCase();
+                    if (isCorrect) score++;
+                    fb.innerHTML = isCorrect ? 
+                        `<span class="correct">✓ Correct</span>` : 
+                        `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
+                } else {
+                    fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
+                }
+                
+                const labels = document.querySelectorAll(`input[name="q${idx}"]`);
+                labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
             });
-        }
-    }
-    // ------------------------------------
 
-    document.getElementById('submit-btn').style.display = 'none';
-    document.getElementById('results-container').style.display = 'block';
-    document.getElementById('final-score').textContent = `${score} / 5`;
-    document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
-}
+            if (answeredCount < 5) {
+                if(!confirm("Not all questions answered. Submit anyway?")) return;
+            }
+
+            // 收集月光到月光寶盒
+            if (score > 0) {
+                try {
+                    // 發送消息給父窗口（如果嵌入在月光寶盒中）
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({
+                            type: "LUNAR_MISSION_RESULT",
+                            correct: score,
+                            mission: "Mission 5: iVocab Reader 閱讀理解",
+                            title: "Mission 5: iVocab Reader"
+                        }, "*");
+                    }
+                    
+                    // 同時也直接更新 Firebase
+                    await collectMoonGlow(score);
+                    
+                    // 顯示通知
+                    showMoonGlowNotification(score);
+                } catch (error) {
+                    console.error("月光收集失敗:", error);
+                }
+            }
+
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('results-container').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score} / 5`;
+            document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 收集月光到 Firebase
+        async function collectMoonGlow(glowPoints) {
+            try {
+                if (!window.currentUser) {
+                    console.log("用戶未登入，無法收集月光");
+                    return;
+                }
+
+                const userRef = doc(db, "users", window.currentUser.uid);
+                
+                // 先獲取當前數據
+                const userSnap = await getDoc(userRef);
+                let currentTotal = 0;
+                let logs = [];
+                
+                if (userSnap.exists()) {
+                    const data = userSnap.data();
+                    currentTotal = data.moonGlowTotal || 0;
+                    logs = data.moonGlowLogs || [];
+                }
+                
+                // 更新總數和日誌
+                const newTotal = currentTotal + glowPoints;
+                const logEntry = {
+                    time: new Date().toISOString(),
+                    correct: glowPoints,
+                    glow: glowPoints,
+                    type: "earn",
+                    source: "Mission 5: iVocab Reader 閱讀理解"
+                };
+                
+                await updateDoc(userRef, {
+                    moonGlowTotal: newTotal,
+                    moonGlowLogs: arrayUnion(logEntry),
+                    lastUpdated: new Date().toISOString()
+                });
+                
+                console.log(`成功收集 ${glowPoints} 點月光，新總數: ${newTotal}`);
+                return true;
+            } catch (error) {
+                console.error("收集月光時出錯:", error);
+                return false;
+            }
+        }
 
         function resetApp() {
             document.getElementById('quiz-container').style.display = 'none';
