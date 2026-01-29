@@ -208,6 +208,20 @@
     text-shadow: 0 0 10px var(--gold-text);
     transform: translateX(-3px);
 }
+        .back-link {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    color: var(--gold-text);
+    text-decoration: none;
+    border: 1px solid var(--gold-border);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
     </style>
 </head>
 <body>
@@ -555,6 +569,14 @@
             document.getElementById('results-container').style.display = 'block';
             document.getElementById('final-score').textContent = `${score} / 5`;
             document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+            if (window.parent) {
+        window.parent.postMessage({
+            type: "missionComplete",
+            missionId: 3 // 這是 iVocab Reader 在月光寶盒中的 ID
+        }, "*");
+        console.log("Mission 3 Complete message sent to parent!");
+    }
+}
         }
 
         function resetApp() {
