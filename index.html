@@ -11,523 +11,196 @@
 
     <style>
         :root {
-            /* ULTRA SHINY GOLD PALETTE */
             --bg-deep: #050510;
             --glass-bg: rgba(15, 15, 25, 0.85);
             --gold-gradient: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
             --gold-text: #FDB931; 
-            --gold-border: rgba(255, 215, 0, 0.4);
-            --text-main: #ffffff;
+            --gold-border: rgba(255, 215, 0, 0.3);
+            --text-main: #e0e0e0;
         }
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow-x: hidden;
-            font-family: 'Lato', sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
             background-color: var(--bg-deep);
-            color: var(--text-main);
-        }
-
-        /* 3D Background Canvas */
-        #canvas-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
-        }
-
-        /* Main UI Container */
-        .app-container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 2rem;
-            min-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            background: var(--glass-bg);
-            border: 1px solid var(--gold-border);
-            border-radius: 24px;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(184, 134, 11, 0.1);
-            position: relative;
-            z-index: 10;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--gold-border);
-            padding-bottom: 1.5rem;
-        }
-
-        h1 {
-            font-family: 'Cinzel', serif;
-            font-size: 3rem;
-            margin: 0;
-            letter-spacing: 1px;
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.5));
-            animation: shine 5s infinite linear;
-        }
-        
-        @keyframes shine { 0% { background-position: 0; } 100% { background-position: 1000px; } }
-
-        h2 {
             font-family: 'Lato', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 300;
-            color: #e0e0e0;
-            margin-top: 15px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        /* Controls */
-        .controls { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
-        select, input {
-            padding: 12px 20px; border-radius: 8px; border: 1px solid var(--gold-border);
-            background: rgba(0, 0, 0, 0.7); color: #fcf6ba; font-family: 'Lato', sans-serif; font-size: 1rem; outline: none; transition: 0.3s;
-        }
-        select:focus, input:focus { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); border-color: #ffd700; }
+        #galaxy-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        button {
-            padding: 12px 30px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer;
-            font-family: 'Cinzel', serif; letter-spacing: 1px; transition: all 0.2s;
-            background: linear-gradient(135deg, #b38728, #fcf6ba, #bf953f);
-            color: #1a0500; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); border: 1px solid #ffd700;
-        }
-        button:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 6px 25px rgba(255, 215, 0, 0.7); }
-        button.secondary { background: transparent; border: 1px solid #fcf6ba; color: #fcf6ba; box-shadow: none; }
-        button.secondary:hover { background: rgba(255, 215, 0, 0.15); color: white; }
-
-        /* Question Cards */
-        .quiz-area { display: none; animation: fadeIn 0.8s ease; }
-        .question-card {
-            background: rgba(255, 255, 255, 0.04); margin-bottom: 2rem; padding: 2rem;
-            border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); border-left: 4px solid #b38728;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .question-text { font-size: 1.25rem; line-height: 1.6; margin-bottom: 1.5rem; }
-        .question-options-block { margin-top: 1.2rem; padding-left: 1.5rem; color: #d1d5db; font-size: 1.15rem; line-height: 2; border-left: 1px solid rgba(255, 255, 255, 0.2); }
-        .options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 1.5rem; }
-        .option-label {
-            display: flex; align-items: center; justify-content: center; padding: 12px;
-            background: rgba(255, 215, 0, 0.05); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 8px; cursor: pointer;
-            transition: all 0.2s; color: #fcf6ba; font-weight: bold; font-family: 'Cinzel', serif;
-        }
-        .option-label:hover { background: rgba(255, 215, 0, 0.25); box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); transform: translateY(-2px); }
-        .option-label.checked { background: linear-gradient(135deg, #b38728, #fcf6ba); color: #222; border-color: #fff; box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
-        .option-label input { display: none; }
-
-        /* Feedback */
-        .feedback-container { margin-top: 20px; padding: 15px; border-radius: 8px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);}
-        .correct { color: #4ade80; font-weight: bold; font-size: 1.1rem; text-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }
-        .incorrect { color: #ff6b6b; font-weight: bold; font-size: 1.1rem; text-shadow: 0 0 10px rgba(255, 107, 107, 0.4); }
-
-        /* Results */
-        .results-area { display: none; text-align: center; animation: fadeIn 0.8s ease; }
-        .score-display {
-            font-size: 5rem; font-family: 'Cinzel', serif;
-            background: linear-gradient(to bottom, #ffffbe 0%, #d4af37 50%, #b8860b 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin: 1rem 0; font-weight: bold; filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
-        }
-        .info-inputs {
-            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; max-width: 650px;
-            margin: 30px auto; text-align: left; padding: 25px;
-            background: rgba(0,0,0,0.4); border-radius: 16px; border: 1px solid rgba(255,215,0,0.1);
-        }
-        .input-group label { display: block; margin-bottom: 8px; color: #fcf6ba; font-size: 0.95rem; letter-spacing: 1px; }
-        .input-group input { width: 100%; box-sizing: border-box; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .loader {
-            border: 4px solid rgba(255,215,0,0.1); border-left-color: #ffd700; border-radius: 50%; width: 50px; height: 50px;
-            animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite; display: none; margin: 30px auto; box-shadow: 0 0 20px rgba(255,215,0,0.2);
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* --- PREVIEW MODAL STYLES --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8); z-index: 2000;
-            display: none; justify-content: center; align-items: center;
-            backdrop-filter: blur(5px);
-        }
-        .modal-content {
-            background: #ffffff; /* Paper white */
-            color: #000000;      /* Ink black */
-            width: 90%; max-width: 800px; height: 90%;
-            overflow-y: auto;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
+        .app-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 30px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--gold-border);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(191,149,63,0.1);
             position: relative;
-            display: flex; flex-direction: column;
         }
-        .report-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; font-family: serif; }
-        .report-details { display: flex; justify-content: space-between; margin-bottom: 20px; font-family: sans-serif; font-size: 14px; background: #f5f5f5; padding: 15px; }
-        .report-body { font-family: serif; flex-grow: 1; }
-        
-        /* Report Question Styles */
-        .report-q-item { margin-bottom: 25px; page-break-inside: avoid; border-bottom: 1px dashed #ccc; padding-bottom: 20px; }
-        .report-q-text { font-weight: bold; margin-bottom: 10px; font-size: 16px; }
-        .report-options { margin-left: 20px; color: #444; font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
-        .report-status { font-family: sans-serif; font-size: 13px; font-weight: bold; padding: 5px 10px; border-radius: 4px; display: inline-block; }
-        .status-correct { background: #e6fffa; color: #047857; border: 1px solid #047857; }
-        .status-wrong { background: #fff5f5; color: #c53030; border: 1px solid #c53030; }
 
-        .modal-actions {
-            margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;
-            display: flex; gap: 15px; justify-content: center;
+        header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid transparent; border-image: var(--gold-gradient) 1; padding-bottom: 20px; }
+        h1 { font-family: 'Cinzel', serif; font-size: 2.5rem; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        select, input {
+            width: 100%; padding: 12px; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--gold-border); border-radius: 8px; color: var(--gold-text);
+            font-size: 1rem; outline: none; transition: 0.3s;
         }
-        .btn-download { background: #000; color: #fff; border: none; }
-        .btn-close { background: #fff; color: #000; border: 1px solid #000; }
+        select:focus, input:focus { box-shadow: 0 0 10px rgba(191,149,63,0.4); border-color: #fcf6ba; }
 
-        /* 返回月光寶盒按鈕樣式 */
-        .back-to-moonlight {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 1000;
-    color: var(--gold-text);
-    text-decoration: none;
-    border: 1px solid var(--gold-border);
-    padding: 6px 15px;
-    border-radius: 20px;
-    font-family: 'Cinzel', serif;
-    font-size: 0.8rem;
-    background: rgba(0,0,0,0.3);
-    transition: 0.3s;
-}
-.back-to-moonlight:hover {
-    background: var(--gold-gradient);
-    color: #000;
-}
+        .quiz-section { display: none; margin-top: 30px; }
+        .question-card { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #bf953f; }
+        .question-text { font-size: 1.1rem; margin-bottom: 15px; color: #fff; line-height: 1.6; }
+        .options-grid { display: grid; gap: 10px; }
+        .option-label {
+            display: flex; align-items: center; padding: 10px; background: rgba(255,255,255,0.05);
+            border-radius: 6px; cursor: pointer; transition: 0.2s;
+        }
+        .option-label:hover { background: rgba(191,149,63,0.15); }
+        .option-label input { width: auto; margin-right: 15px; cursor: pointer; }
+
+        .btn-main {
+            display: block; width: 100%; padding: 15px; margin-top: 20px;
+            background: var(--gold-gradient); border: none; border-radius: 10px;
+            color: #000; font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.1rem;
+            cursor: pointer; transition: 0.4s; text-transform: uppercase;
+        }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(191,149,63,0.4); }
+
+        .feedback { margin-top: 10px; font-weight: bold; display: none; }
+        .correct { color: #4CAF50; }
+        .incorrect { color: #FF5252; }
+
+        #results-container { display: none; text-align: center; padding: 20px; margin-top: 20px; border: 2px solid var(--gold-text); border-radius: 15px; }
     </style>
 </head>
 <body>
-
-    <div id="canvas-container"></div>
+    <canvas id="galaxy-bg"></canvas>
 
     <div class="app-container" id="main-app">
         <header>
-            <h1>Shirley's Interactive iVocab Reader</h1>
-            <h2>Assess Your Reading Comprehension Anywhere, Anytime</h2>
-            <a href="https://ducj-creator.github.io/Moonlight-Box/" class="back-to-moonlight">
-            🌙 Back to Moonlight
-        </a>
+            <h1>iVocab Reader 閱讀理解</h1>
+            <p style="color: var(--gold-text)">Interactive Learning Experience</p>
         </header>
+
         <div class="controls">
-            <select id="level-select" onchange="handleLevelChange()">
-                <option value="" disabled selected>Select Level</option>
-                <option value="1">Level 1</option>
-                <option value="2" disabled>Level 2 (Coming Soon)</option>
-                <option value="3">Level 3</option>
-                <option value="4">Level 4</option>
-                <option value="5" disabled>Level 5 (Coming Soon)</option>
-                <option value="6" disabled>Level 6 (Coming Soon)</option>
-            </select>
-
-            <select id="unit-select">
-                <option value="" disabled selected>Select Unit</option>
+            <div>
+                <label style="display:block; margin-bottom:5px;">Target Unit</label>
+                <select id="unit-select" onchange="loadUnit()">
+                    <option value="">Select Unit...</option>
+                    <option value="1">Unit 1: Global Warming</option>
+                    <option value="2">Unit 2: Artificial Intelligence</option>
                 </select>
-
-            <button onclick="startQuiz()">Start Assessment</button>
-        </div>
-
-        <div class="loader" id="loader"></div>
-
-        <div id="quiz-container" class="quiz-area">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                 <h3 id="current-unit-title" style="color: #fcf6ba; font-family: 'Cinzel'; font-size: 1.8rem; border-bottom: 2px solid #b38728; display:inline-block; padding-bottom:10px; margin-top:0;">Unit Title</h3>
             </div>
-            
-            <div id="questions-list"></div>
-            
-            <div style="text-align: center; margin-top: 3rem;">
-                <button id="submit-btn" onclick="submitQuiz()" style="font-size: 1.2rem; padding: 15px 60px;">Submit Answers</button>
+            <div>
+                <label style="display:block; margin-bottom:5px;">Student Name</label>
+                <input type="text" id="input-name" placeholder="Enter your name">
             </div>
         </div>
 
-        <div id="results-container" class="results-area">
-            <h2 style="color: #fcf6ba; font-size: 2rem;">Assessment Complete</h2>
-            <div class="score-display" id="final-score">0 / 5</div>
-            
-            <div class="info-inputs">
-                <div class="input-group">
-                    <label>Class</label>
-                    <input type="text" id="input-class" placeholder="e.g. 10A">
-                </div>
-                <div class="input-group">
-                    <label>Seat No.</label>
-                    <input type="text" id="input-seat" placeholder="e.g. 15">
-                </div>
-                <div class="input-group">
-                    <label>Name</label>
-                    <input type="text" id="input-name" placeholder="Student Name">
-                </div>
-            </div>
-
-            <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
-                <button onclick="openPreviewModal()">Review & Download Report</button>
-                <button class="secondary" onclick="resetApp()">New Quiz</button>
-            </div>
+        <div id="quiz-area" class="quiz-section">
+            <div id="questions-container"></div>
+            <button id="submit-btn" class="btn-main" onclick="submitQuiz()">Submit All Answers</button>
         </div>
-    </div>
 
-    <div id="preview-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div id="report-content">
-                <div class="report-header">
-                    <h1 style="font-size:28px; margin:0;">Shirley's Interactive iVocab Reader</h1>
-                    <h2 style="font-size:18px; color:#555; margin:5px 0 0 0; font-family:sans-serif;">Comprehensive Assessment Report</h2>
-                </div>
-                
-                <div class="report-details">
-                    <div>
-                        <strong>Student:</strong> <span id="rep-name"></span><br>
-                        <strong>Class/Seat:</strong> <span id="rep-class"></span> / <span id="rep-seat"></span>
-                    </div>
-                    <div style="text-align:right;">
-                        <strong>Date:</strong> <span id="rep-date"></span><br>
-                        <strong>Unit:</strong> <span id="rep-unit"></span>
-                    </div>
-                </div>
-
-                <div style="background:#f9f9f9; padding:15px; text-align:center; border:2px solid #eee; margin-bottom:30px;">
-                    <span style="font-size:14px; color:#666; font-family:sans-serif;">FINAL SCORE</span><br>
-                    <span id="rep-score" style="font-size:48px; font-weight:bold; color:#000;"></span>
-                </div>
-
-                <div class="report-body" id="rep-questions-container">
-                    </div>
-                
-                <div style="margin-top:30px; border-top:1px solid #ddd; padding-top:10px; font-size:10px; color:#999; text-align:center; font-family:sans-serif;">
-                    Generated by iVocab System | Verified Assessment
-                </div>
-            </div>
-            <div class="modal-actions" data-html2canvas-ignore="true">
-                <button class="btn-download" onclick="generatePDF()">Confirm & Download PDF</button>
-                <button class="btn-close" onclick="closePreviewModal()">Back to Edit</button>
-            </div>
+        <div id="results-container">
+            <h2 style="font-family:Cinzel; color:var(--gold-text);">Mission Accomplished!</h2>
+            <p style="font-size:1.5rem; margin:15px 0;">Your Score: <span id="final-score">0 / 5</span></p>
+            <p>月光點數已自動上傳至寶盒 🌙</p>
         </div>
     </div>
 
     <script>
-        // --- 1. Three.js BRIGHT GALAXY ---
-        function initGalaxy() {
-            const container = document.getElementById('canvas-container');
-            const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x050510, 0.001);
-
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 40; 
-            camera.position.y = 20;
-            camera.lookAt(0, 0, 0);
-
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            container.appendChild(renderer.domElement);
-
-            const particlesGeometry = new THREE.BufferGeometry();
-            const count = 6000;
-            const posArray = new Float32Array(count * 3);
-            const colorArray = new Float32Array(count * 3);
-            const colorInside = new THREE.Color('#ffcc00'); 
-            const colorOutside = new THREE.Color('#1b3984');
-
-            for(let i = 0; i < count; i++) {
-                const i3 = i * 3;
-                const radius = Math.random() * 50;
-                const spinAngle = radius * 0.8;
-                const branchAngle = (i % 3) / 3 * Math.PI * 2;
-                
-                const randomX = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.5 * radius;
-                const randomY = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.5 * radius;
-                const randomZ = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.5 * radius;
-
-                posArray[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
-                posArray[i3+1] = randomY * 0.5;
-                posArray[i3+2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
-
-                const mixedColor = colorInside.clone();
-                mixedColor.lerp(colorOutside, radius / 50);
-
-                colorArray[i3] = mixedColor.r;
-                colorArray[i3+1] = mixedColor.g;
-                colorArray[i3+2] = mixedColor.b;
+        const STATE = {
+            currentQuestions: [],
+            userAnswers: {},
+            units: {
+                "1": [
+                    { q: "What is the main cause of global warming mentioned?", options: ["A. Ocean currents", "B. Greenhouse gas emissions", "C. Solar flares", "D. Volcanic activity"], answer: "B" },
+                    { q: "Which gas is most responsible for the greenhouse effect?", options: ["A. Oxygen", "B. Nitrogen", "C. Carbon Dioxide", "D. Helium"], answer: "C" },
+                    { q: "What is a likely consequence of rising sea levels?", options: ["A. Coastal flooding", "B. More desert land", "C. Lower global temperatures", "D. Decreased rainfall"], answer: "A" },
+                    { q: "How can individuals help reduce global warming?", options: ["A. Use more plastic", "B. Drive alone always", "C. Reduce energy consumption", "D. Waste more water"], answer: "C" },
+                    { q: "What do scientists use to track climate change?", options: ["A. Satellite data", "B. Guesswork", "C. Old myths", "D. Wind speed only"], answer: "A" }
+                ],
+                "2": [
+                    { q: "What does AI stand for?", options: ["A. Actual Intelligence", "B. Artificial Intelligence", "C. Automated Interaction", "D. Advanced Integration"], answer: "B" },
+                    { q: "Which is a common application of AI?", options: ["A. Manual typewriters", "B. Face recognition", "C. Paper maps", "D. Hand-cranked fans"], answer: "B" },
+                    { q: "What is machine learning?", options: ["A. Machines cleaning themselves", "B. Computers learning from data", "C. Building metal robots", "D. Manual data entry"], answer: "B" },
+                    { q: "Who is considered a pioneer of AI?", options: ["A. Alan Turing", "B. Napoleon", "C. Shakespeare", "D. Beethoven"], answer: "A" },
+                    { q: "A risk of AI development is...", options: ["A. Better healthcare", "B. Privacy concerns", "C. Faster calculations", "D. Improved efficiency"], answer: "B" }
+                ]
             }
+        };
 
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+        function initGalaxy() {
+            const canvas = document.getElementById('galaxy-bg');
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
 
-            const particlesMaterial = new THREE.PointsMaterial({
-                size: 0.3, sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true
-            });
+            const starGeometry = new THREE.BufferGeometry();
+            const starMaterial = new THREE.PointsMaterial({ color: 0xFFD700, size: 0.02 });
+            const starVertices = [];
+            for (let i = 0; i < 6000; i++) {
+                starVertices.push((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20);
+            }
+            starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+            const stars = new THREE.Points(starGeometry, starMaterial);
+            scene.add(stars);
 
-            const particles = new THREE.Points(particlesGeometry, particlesMaterial);
-            scene.add(particles);
-
-            const clock = new THREE.Clock();
             function animate() {
-                const elapsedTime = clock.getElapsedTime();
-                particles.rotation.y = elapsedTime * 0.05;
-                renderer.render(scene, camera);
                 requestAnimationFrame(animate);
+                stars.rotation.y += 0.001;
+                renderer.render(scene, camera);
             }
             animate();
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
         }
 
-        // --- 2. LOGIC ---
-        const STATE = { allData: [], currentQuestions: [], level: null, userAnswers: {} };
-
-        // Populate Unit Select
-        const unitSelect = document.getElementById('unit-select');
-        for (let i = 1; i <= 50; i++) {
-            const option = document.createElement('option');
-            option.value = `Unit ${i}`;
-            option.textContent = `Unit ${i}`;
-            unitSelect.appendChild(option);
-        }
-
-        function handleLevelChange() {
-            STATE.allData = [];
-            STATE.level = document.getElementById('level-select').value;
-            console.log("Level changed to:", STATE.level);
-        }
-
-        async function fetchData(level) {
-            document.getElementById('loader').style.display = 'block';
-            try {
-                const url = `https://ducj-creator.github.io/iVocab-Readers/L${level}RC.json`;
-                console.log("Fetching from:", url);
-                const res = await fetch(url);
-                if (!res.ok) throw new Error("Fetch failed");
-                const data = await res.json();
-                processData(data);
-                document.getElementById('loader').style.display = 'none';
-                return true;
-            } catch (e) {
-                console.error(e);
-                alert(`Could not load data for Level ${level}. Please check internet connection.`);
-                document.getElementById('loader').style.display = 'none';
-                return false;
-            }
-        }
-
-        function processData(data) {
-            let lastUnit = "";
-            STATE.allData = data.map(item => {
-                // Ensure item.unit is a valid string before checking
-                if (item.unit && typeof item.unit === 'string' && item.unit.trim().length > 0) {
-                    lastUnit = item.unit;
-                }
-                
-                // --- FIXED REGEX TO HANDLE "U36" AND "Unit 36" ---
-                // Looks for "Unit" OR "U", followed by optional whitespace and digits
-                const match = lastUnit.match(/(?:Unit|U)\s*(\d+)/i);
-                const uNum = match ? parseInt(match[1]) : null;
-
-                return { 
-                    ...item, 
-                    fullUnitName: lastUnit, 
-                    uNum: uNum // Store the clean number
-                };
-            });
-        }
-
-        async function startQuiz() {
-            const level = document.getElementById('level-select').value;
-            const unitVal = document.getElementById('unit-select').value; // e.g., "Unit 36"
+        function loadUnit() {
+            const unitId = document.getElementById('unit-select').value;
+            if (!unitId) return;
             
-            if (!level) return alert("Please select a Level first.");
-            if (!unitVal) return alert("Please select a Unit.");
-
-            // Extract number from selection
-            const selMatch = unitVal.match(/(\d+)/);
-            if (!selMatch) return alert("Invalid Unit Selection");
-            const targetNum = parseInt(selMatch[0]);
-
-            if (STATE.allData.length === 0) {
-                const success = await fetchData(level);
-                if (!success) return;
-            }
-
-            // FILTER BY NUMBER INSTEAD OF STRING
-            const qs = STATE.allData.filter(q => q.uNum === targetNum);
+            STATE.currentQuestions = STATE.units[unitId];
+            STATE.userAnswers = {};
             
-            if (qs.length === 0) {
-                alert(`No questions found for Unit ${targetNum} in Level ${level}.`);
-                return;
-            }
-
-            STATE.currentQuestions = qs.sort(() => 0.5 - Math.random()).slice(0, 5);
-            STATE.userAnswers = {}; 
-            document.getElementById('current-unit-title').textContent = STATE.currentQuestions[0].fullUnitName;
-            renderQuestions();
-        }
-
-        function renderQuestions() {
-            const list = document.getElementById('questions-list');
-            list.innerHTML = "";
-            document.getElementById('quiz-container').style.display = 'block';
-            document.getElementById('results-container').style.display = 'none';
-
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+            
             STATE.currentQuestions.forEach((q, idx) => {
                 const card = document.createElement('div');
                 card.className = 'question-card';
-                
-                let text = q.question.replace(/^\d+\.\s*/, '');
-                
-                // --- FIXED SPLIT LOGIC FOR LEVEL 1 (NO SPACES) ---
-                // Checks for A) B) C) D) with optional whitespace before them
-                let parts = text.split(/(?=\s*[A-D]\))/);
-                
-                const body = parts[0];
-                const opts = parts.slice(1).map(p => p.trim()).join('<br>');
-
                 card.innerHTML = `
-                    <div class="question-text">
-                        <strong style="color:var(--gold-text)">Q${idx+1}.</strong> ${body}
-                        <div class="question-options-block">${opts}</div>
-                    </div>
+                    <p class="question-text">${idx + 1}. ${q.q}</p>
                     <div class="options-grid">
-                        ${['A','B','C','D'].map(opt => `
-                            <label class="option-label" onclick="selectOpt(this, ${idx}, '${opt}')">
-                                <input type="radio" name="q${idx}" value="${opt}"> ${opt}
+                        ${q.options.map(opt => `
+                            <label class="option-label">
+                                <input type="radio" name="q${idx}" value="${opt[0]}" onchange="recordAnswer(${idx}, '${opt[0]}')">
+                                ${opt}
                             </label>
                         `).join('')}
                     </div>
-                    <div id="feedback-${idx}" class="feedback-container" style="display:none"></div>
+                    <div id="feedback-${idx}" class="feedback"></div>
                 `;
-                list.appendChild(card);
+                container.appendChild(card);
             });
-            document.getElementById('quiz-container').scrollIntoView({ behavior: 'smooth' });
+            
+            document.getElementById('quiz-area').style.display = 'block';
+            document.getElementById('results-container').style.display = 'none';
+            document.getElementById('submit-btn').style.display = 'block';
         }
 
-        function selectOpt(label, qIdx, val) {
+        function recordAnswer(qIdx, val) {
             STATE.userAnswers[qIdx] = val;
-            const all = label.parentElement.querySelectorAll('.option-label');
-            all.forEach(l => l.classList.remove('checked'));
-            label.classList.add('checked');
-            label.querySelector('input').checked = true;
         }
 
-function submitQuiz() {
+        function submitQuiz() {
             let score = 0;
             let answeredCount = 0;
             
@@ -560,137 +233,19 @@ function submitQuiz() {
             document.getElementById('final-score').textContent = `${score} / 5`;
             document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
 
-            // 回傳點數給月光寶盒
+            // --- 核心修正：回傳點數給月光寶盒 ---
             if (window.parent) {
                 window.parent.postMessage({
-                    type: "LUNAR_MISSION_RESULT",
+                    type: "LUNAR_MISSION_RESULT", 
                     mission: "Mission 3: iVocab Reader 閱讀理解",
                     correct: score,
                     total: 5
                 }, "*");
-                console.log("Mission result sent to Moonlight!");
+                console.log("Mission 3 Result Sent:", score);
             }
-        } // 確保這裡只有一個收尾括號
-
-        function resetApp() {
-            document.getElementById('quiz-container').style.display = 'none';
-            document.getElementById('results-container').style.display = 'none';
-            document.getElementById('submit-btn').style.display = 'inline-block';
-            document.getElementById('unit-select').value = "";
-            ['input-class', 'input-seat', 'input-name'].forEach(id => document.getElementById(id).value = '');
-            STATE.userAnswers = {};
-            window.scrollTo({top:0, behavior:'smooth'});
-        }
-
-        // --- 3. PREVIEW & REPORT GENERATION ---
-        function openPreviewModal() {
-            const cls = document.getElementById('input-class').value;
-            const seat = document.getElementById('input-seat').value;
-            const name = document.getElementById('input-name').value;
-            const level = document.getElementById('level-select').value;
-            
-            if(!cls || !seat || !name) {
-                alert("Please enter Name, Class, and Seat No. to generate the report.");
-                return;
-            }
-
-            document.getElementById('rep-name').innerText = name;
-            document.getElementById('rep-class').innerText = cls;
-            document.getElementById('rep-seat').innerText = seat;
-            document.getElementById('rep-date').innerText = new Date().toLocaleDateString();
-            
-            const unitTitle = document.getElementById('current-unit-title').innerText;
-            document.getElementById('rep-unit').innerText = `Level ${level} | ${unitTitle}`;
-            document.getElementById('rep-score').innerText = document.getElementById('final-score').innerText;
-
-            const container = document.getElementById('rep-questions-container');
-            container.innerHTML = "";
-
-            STATE.currentQuestions.forEach((q, idx) => {
-                const userAns = STATE.userAnswers[idx] || "-";
-                const correctAns = q.answer.trim().toUpperCase();
-                const isCorrect = userAns === correctAns;
-
-                let text = q.question.replace(/^\d+\.\s*/, '');
-                
-                // --- FIXED SPLIT LOGIC HERE TOO ---
-                let parts = text.split(/(?=\s*[A-D]\))/);
-                
-                const body = parts[0];
-                const opts = parts.slice(1).map(p => p.trim()).join('<br>');
-
-                let statusHtml = "";
-                if(isCorrect) {
-                    statusHtml = `<span class="report-status status-correct">✓ Correct (Your Answer: ${userAns})</span>`;
-                } else {
-                    statusHtml = `<span class="report-status status-wrong">✗ Incorrect (Your Answer: ${userAns})</span> 
-                                  <span style="font-size:13px; margin-left:10px;">Correct Answer: <strong>${correctAns}</strong></span>`;
-                }
-
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'report-q-item';
-                itemDiv.innerHTML = `
-                    <div class="report-q-text">Q${idx+1}. ${body}</div>
-                    <div class="report-options">${opts}</div>
-                    <div style="margin-top:5px;">${statusHtml}</div>
-                `;
-                container.appendChild(itemDiv);
-            });
-
-            document.getElementById('preview-modal').style.display = 'flex';
-        }
-
-        function closePreviewModal() {
-            document.getElementById('preview-modal').style.display = 'none';
-        }
-
-        window.jsPDF = window.jspdf.jsPDF;
-
-        function generatePDF() {
-            const element = document.getElementById('report-content');
-            const name = document.getElementById('input-name').value;
-            const btn = document.querySelector('.btn-download');
-            
-            btn.innerText = "Generating...";
-            btn.disabled = true;
-
-            html2canvas(element, { scale: 2 }).then(canvas => {
-                const imgData = canvas.toDataURL('image/jpeg', 0.95);
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                
-                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save(`Full_Report_${name}.pdf`);
-                
-                btn.innerText = "Confirm & Download PDF";
-                btn.disabled = false;
-            }).catch(err => {
-                alert("Error generating PDF. Please try again.");
-                console.error(err);
-                btn.innerText = "Confirm & Download PDF";
-                btn.disabled = false;
-            });
         }
 
         initGalaxy();
-        // 讓 Mission 3 具備收集點數的能力
-function collectMoonlight() {
-    if (window.parent) {
-        window.parent.postMessage({
-            type: "missionComplete",
-            missionId: 3 // 對應月光寶盒中的 Mission 3
-        }, "*");
-        console.log("Moonlight point sent!");
-    }
-}
-
-// 修改您原有的 generatePDF 函數，在下載時順便給點數
-const originalGeneratePDF = generatePDF;
-generatePDF = function() {
-    collectMoonlight(); // 觸發收集月光
-    originalGeneratePDF();
-};
     </script>
 </body>
 </html>
