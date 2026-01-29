@@ -506,32 +506,53 @@
         }
 
 function submitQuiz() {
-    // ... 原有的評分邏輯 ...
     let score = 0;
+    let answeredCount = 0;
+    
     STATE.currentQuestions.forEach((q, idx) => {
+        const fb = document.getElementById(`feedback-${idx}`);
+        fb.style.display = 'block';
         const userVal = STATE.userAnswers[idx];
-        if (userVal && userVal === q.answer.trim().toUpperCase()) score++;
+        
+        if (userVal) {
+            answeredCount++;
+            const isCorrect = userVal === q.answer.trim().toUpperCase();
+            if (isCorrect) score++;
+            fb.innerHTML = isCorrect ? 
+                `<span class="correct">✓ Correct</span>` : 
+                `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
+        } else {
+            fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
+        }
+        
+        const labels = document.querySelectorAll(`input[name="q${idx}"]`);
+        labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
     });
 
-    // --- 修正後的寫入邏輯 ---
+    if (answeredCount < 5) if(!confirm("Not all questions answered. Submit anyway?")) return;
+
+    // --- 關鍵修正：寫入正確的原始欄位名稱 ---
     if (typeof auth !== 'undefined' && auth.currentUser) {
         const userRef = doc(db, "users", auth.currentUser.uid);
-        
-        if (score > 0) {
+        const earnedGlow = score; 
+
+        if (earnedGlow > 0) {
             updateDoc(userRef, {
-                // 必須與 moonlight 讀取的欄位名稱完全一致
-                "moonGlowTotal": increment(score), 
+                // 必須與您的原始欄位名稱一致
+                "moonGlowTotal": increment(earnedGlow),
                 "moonGlowLogs": arrayUnion({
                     id: Date.now(),
-                    action: "Mission 3: iVocab Reader 閱讀理解",
-                    change: `+${score}`,
+                    action: "Mission 3: iVocab Reader 成功",
+                    change: `+${earnedGlow}`,
                     time: new Date().toLocaleString()
                 })
+            }).then(() => {
+                console.log("Mission 3 分數已成功收集到月光寶盒");
             });
         }
     }
+    // ------------------------------------
 
-    // ... 原有的 UI 顯示代碼 ...
     document.getElementById('submit-btn').style.display = 'none';
     document.getElementById('results-container').style.display = 'block';
     document.getElementById('final-score').textContent = `${score} / 5`;
