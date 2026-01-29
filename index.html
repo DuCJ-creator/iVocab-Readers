@@ -611,62 +611,79 @@
             }, 3000);
         }
 
-        async function submitQuiz() {
-            let score = 0;
-            let answeredCount = 0;
-            
-            STATE.currentQuestions.forEach((q, idx) => {
-                const fb = document.getElementById(`feedback-${idx}`);
-                fb.style.display = 'block';
-                const userVal = STATE.userAnswers[idx];
-                
-                if (userVal) {
-                    answeredCount++;
-                    const isCorrect = userVal === q.answer.trim().toUpperCase();
-                    if (isCorrect) score++;
-                    fb.innerHTML = isCorrect ? 
-                        `<span class="correct">✓ Correct</span>` : 
-                        `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
-                } else {
-                    fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
-                }
-                
-                const labels = document.querySelectorAll(`input[name="q${idx}"]`);
-                labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
-            });
-
-            if (answeredCount < 5) {
-                if(!confirm("Not all questions answered. Submit anyway?")) return;
-            }
-
-            // 收集月光到月光寶盒
-            if (score > 0) {
-                try {
-                    // 發送消息給父窗口（如果嵌入在月光寶盒中）
-                    if (window.parent && window.parent !== window) {
-                        window.parent.postMessage({
-                            type: "LUNAR_MISSION_RESULT",
-                            correct: score,
-                            mission: "Mission 5: iVocab Reader 閱讀理解",
-                            title: "Mission 5: iVocab Reader"
-                        }, "*");
-                    }
-                    
-                    // 同時也直接更新 Firebase
-                    await collectMoonGlow(score);
-                    
-                    // 顯示通知
-                    showMoonGlowNotification(score);
-                } catch (error) {
-                    console.error("月光收集失敗:", error);
-                }
-            }
-
-            document.getElementById('submit-btn').style.display = 'none';
-            document.getElementById('results-container').style.display = 'block';
-            document.getElementById('final-score').textContent = `${score} / 5`;
-            document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+async function submitQuiz() {
+    let score = 0;
+    let answeredCount = 0;
+    
+    STATE.currentQuestions.forEach((q, idx) => {
+        const fb = document.getElementById(`feedback-${idx}`);
+        fb.style.display = 'block';
+        const userVal = STATE.userAnswers[idx];
+        
+        if (userVal) {
+            answeredCount++;
+            const isCorrect = userVal === q.answer.trim().toUpperCase();
+            if (isCorrect) score++;
+            fb.innerHTML = isCorrect ? 
+                `<span class="correct">✓ Correct</span>` : 
+                `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
+        } else {
+            fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
         }
+        
+        const labels = document.querySelectorAll(`input[name="q${idx}"]`);
+        labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
+    });
+
+    if (answeredCount < 5) {
+        if(!confirm("Not all questions answered. Submit anyway?")) return;
+    }
+
+    // 收集月光到月光寶盒
+    if (score > 0) {
+        try {
+            // 方法1：發送消息給父窗口（如果嵌入在月光寶盒中）
+            console.log("嘗試發送消息到父窗口...");
+            if (window.parent && window.parent !== window) {
+                const messageData = {
+                    type: "LUNAR_MISSION_RESULT",
+                    correct: score,
+                    mission: "Mission 5: iVocab Reader 閱讀理解",
+                    title: "Mission 5: iVocab Reader"
+                };
+                console.log("發送消息:", messageData);
+                window.parent.postMessage(messageData, "*");
+            }
+            
+            // 方法2：發送消息給 opener（如果從月光寶盒打開新窗口）
+            if (window.opener && !window.opener.closed) {
+                const messageData = {
+                    type: "LUNAR_MISSION_RESULT",
+                    correct: score,
+                    mission: "Mission 5: iVocab Reader 閱讀理解",
+                    title: "Mission 5: iVocab Reader"
+                };
+                console.log("發送消息給 opener:", messageData);
+                window.opener.postMessage(messageData, "*");
+            }
+            
+            // 方法3：直接更新 Firebase
+            await collectMoonGlow(score);
+            
+            // 顯示通知
+            showMoonGlowNotification(score);
+            
+            console.log(`iVocab Reader 提交完成，分數: ${score}`);
+        } catch (error) {
+            console.error("月光收集失敗:", error);
+        }
+    }
+
+    document.getElementById('submit-btn').style.display = 'none';
+    document.getElementById('results-container').style.display = 'block';
+    document.getElementById('final-score').textContent = `${score} / 5`;
+    document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+}
 
         // 收集月光到 Firebase
         async function collectMoonGlow(glowPoints) {
