@@ -528,53 +528,49 @@
         }
 
 function submitQuiz() {
-    let score = 0;
-    let answeredCount = 0;
-    
-    // 檢查答案邏輯
-    STATE.currentQuestions.forEach((q, idx) => {
-        const fb = document.getElementById(`feedback-${idx}`);
-        fb.style.display = 'block';
-        const userVal = STATE.userAnswers[idx];
-        
-        if (userVal) {
-            answeredCount++;
-            const isCorrect = userVal === q.answer.trim().toUpperCase();
-            if (isCorrect) score++;
-            fb.innerHTML = isCorrect ? 
-                `<span class="correct">✓ Correct</span>` : 
-                `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
-        } else {
-            fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
-        }
-        
-        const labels = document.querySelectorAll(`input[name="q${idx}"]`);
-        labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
-    });
+            let score = 0;
+            let answeredCount = 0;
+            
+            STATE.currentQuestions.forEach((q, idx) => {
+                const fb = document.getElementById(`feedback-${idx}`);
+                fb.style.display = 'block';
+                const userVal = STATE.userAnswers[idx];
+                
+                if (userVal) {
+                    answeredCount++;
+                    const isCorrect = userVal === q.answer.trim().toUpperCase();
+                    if (isCorrect) score++;
+                    fb.innerHTML = isCorrect ? 
+                        `<span class="correct">✓ Correct</span>` : 
+                        `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
+                } else {
+                    fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
+                }
+                
+                const labels = document.querySelectorAll(`input[name="q${idx}"]`);
+                labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
+            });
 
-    // 如果沒寫完，詢問是否提交
-    if (answeredCount < 5) {
-        if (!confirm("Not all questions answered. Submit anyway?")) return;
-    }
+            if (answeredCount < 5) {
+                if(!confirm("Not all questions answered. Submit anyway?")) return;
+            }
 
-    // 顯示結果介面
-    document.getElementById('submit-btn').style.display = 'none';
-    document.getElementById('results-container').style.display = 'block';
-    document.getElementById('final-score').textContent = `${score} / 5`;
-    document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('results-container').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score} / 5`;
+            document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
 
-    // --- 發送月光點數回傳 (對齊 LUNAR_MISSION_RESULT 格式) ---
-    if (window.parent) {
-        window.parent.postMessage({
-            type: "LUNAR_MISSION_RESULT", 
-            mission: "Mission 3: iVocab Reader 閱讀理解",
-            correct: score,  // 傳遞實際答對題數
-            total: 5         // 總題數
-        }, "*");
-        console.log("Lunar Mission Data Sent: ", score, "/ 5");
-    }
-}
-        }
+            // 回傳點數給月光寶盒
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: "LUNAR_MISSION_RESULT",
+                    mission: "Mission 3: iVocab Reader 閱讀理解",
+                    correct: score,
+                    total: 5
+                }, "*");
+                console.log("Mission result sent to Moonlight!");
+            }
+        } // 確保這裡只有一個收尾括號
 
         function resetApp() {
             document.getElementById('quiz-container').style.display = 'none';
