@@ -190,37 +190,25 @@
         .btn-download { background: #000; color: #fff; border: none; }
         .btn-close { background: #fff; color: #000; border: 1px solid #000; }
 
-        /* 返回月光寶盒連結樣式 */
+        /* 返回月光寶盒按鈕樣式 */
         .back-to-moonlight {
     position: absolute;
     top: 20px;
     left: 20px;
-    color: var(--gold-text);
-    text-decoration: none;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: 0.3s;
-    z-index: 100;
-    }
-    .back-to-moonlight:hover {
-    text-shadow: 0 0 10px var(--gold-text);
-    transform: translateX(-3px);
-}
-        .back-link {
-    position: absolute;
-    top: 15px;
-    left: 15px;
+    z-index: 1000;
     color: var(--gold-text);
     text-decoration: none;
     border: 1px solid var(--gold-border);
-    padding: 5px 15px;
+    padding: 6px 15px;
     border-radius: 20px;
     font-family: 'Cinzel', serif;
     font-size: 0.8rem;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
+    background: rgba(0,0,0,0.3);
+    transition: 0.3s;
+}
+.back-to-moonlight:hover {
+    background: var(--gold-gradient);
+    color: #000;
 }
     </style>
 </head>
@@ -232,9 +220,9 @@
         <header>
             <h1>Shirley's Interactive iVocab Reader</h1>
             <h2>Assess Your Reading Comprehension Anywhere, Anytime</h2>
-            <a href=" https://ducj-creator.github.io/Teacher-Shirley/moonlight.html" class="back-to-moonlight">
-    🌙 從月光寶盒進入
-</a>
+            <a href="https://ducj-creator.github.io/Moonlight-Box/" class="back-to-moonlight">
+            🌙 Back to Moonlight
+        </a>
         </header>
         <div class="controls">
             <select id="level-select" onchange="handleLevelChange()">
@@ -539,42 +527,51 @@
             label.querySelector('input').checked = true;
         }
 
-        function submitQuiz() {
-            let score = 0;
-            let answeredCount = 0;
-            
-            STATE.currentQuestions.forEach((q, idx) => {
-                const fb = document.getElementById(`feedback-${idx}`);
-                fb.style.display = 'block';
-                const userVal = STATE.userAnswers[idx];
-                
-                if (userVal) {
-                    answeredCount++;
-                    const isCorrect = userVal === q.answer.trim().toUpperCase();
-                    if (isCorrect) score++;
-                    fb.innerHTML = isCorrect ? 
-                        `<span class="correct">✓ Correct</span>` : 
-                        `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
-                } else {
-                    fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
-                }
-                
-                const labels = document.querySelectorAll(`input[name="q${idx}"]`);
-                labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
-            });
+function submitQuiz() {
+    let score = 0;
+    let answeredCount = 0;
+    
+    // 檢查答案邏輯
+    STATE.currentQuestions.forEach((q, idx) => {
+        const fb = document.getElementById(`feedback-${idx}`);
+        fb.style.display = 'block';
+        const userVal = STATE.userAnswers[idx];
+        
+        if (userVal) {
+            answeredCount++;
+            const isCorrect = userVal === q.answer.trim().toUpperCase();
+            if (isCorrect) score++;
+            fb.innerHTML = isCorrect ? 
+                `<span class="correct">✓ Correct</span>` : 
+                `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
+        } else {
+            fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
+        }
+        
+        const labels = document.querySelectorAll(`input[name="q${idx}"]`);
+        labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
+    });
 
-            if (answeredCount < 5) if(!confirm("Not all questions answered. Submit anyway?")) return;
+    // 如果沒寫完，詢問是否提交
+    if (answeredCount < 5) {
+        if (!confirm("Not all questions answered. Submit anyway?")) return;
+    }
 
-            document.getElementById('submit-btn').style.display = 'none';
-            document.getElementById('results-container').style.display = 'block';
-            document.getElementById('final-score').textContent = `${score} / 5`;
-            document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
-            if (window.parent) {
+    // 顯示結果介面
+    document.getElementById('submit-btn').style.display = 'none';
+    document.getElementById('results-container').style.display = 'block';
+    document.getElementById('final-score').textContent = `${score} / 5`;
+    document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+
+    // --- 發送月光點數回傳 (對齊 LUNAR_MISSION_RESULT 格式) ---
+    if (window.parent) {
         window.parent.postMessage({
-            type: "missionComplete",
-            missionId: 3 // 這是 iVocab Reader 在月光寶盒中的 ID
+            type: "LUNAR_MISSION_RESULT", 
+            mission: "Mission 3: iVocab Reader 閱讀理解",
+            correct: score,  // 傳遞實際答對題數
+            total: 5         // 總題數
         }, "*");
-        console.log("Mission 3 Complete message sent to parent!");
+        console.log("Lunar Mission Data Sent: ", score, "/ 5");
     }
 }
         }
