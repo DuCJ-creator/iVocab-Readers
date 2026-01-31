@@ -190,33 +190,6 @@
         .btn-download { background: #000; color: #fff; border: none; }
         .btn-close { background: #fff; color: #000; border: 1px solid #000; }
 
-        /* Moon Glow Notification */
-        .moon-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #0b1333, #05060d);
-            color: #f1c40f;
-            padding: 15px 25px;
-            border-radius: 12px;
-            border: 2px solid #f1c40f;
-            box-shadow: 0 0 25px rgba(241, 196, 15, 0.6);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-in 2.5s forwards;
-            font-family: 'Cinzel', serif;
-            max-width: 300px;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes fadeOut {
-            to { opacity: 0; transform: translateX(100%); }
-        }
-
     </style>
 </head>
 <body>
@@ -233,7 +206,7 @@
             <select id="level-select" onchange="handleLevelChange()">
                 <option value="" disabled selected>Select Level</option>
                 <option value="1">Level 1</option>
-                <option value="2" disabled>Level 2 (Coming Soon)</option>
+                <option value="2">Level 2</option>
                 <option value="3">Level 3</option>
                 <option value="4">Level 4</option>
                 <option value="5" disabled>Level 5 (Coming Soon)</option>
@@ -324,64 +297,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged,
-            setPersistence,
-            browserLocalPersistence 
-        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            getDoc,
-            setDoc,
-            updateDoc,
-            arrayUnion,
-            increment 
-        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-        // Firebase 配置
-        const firebaseConfig = {
-            apiKey: "AIzaSyCta1_RddjhYBA437cl8Wg1kGW_bsVimK8",
-            authDomain: "teacher-shirley.firebaseapp.com",
-            databaseURL: "https://teacher-shirley-default-rtdb.firebaseio.com",
-            projectId: "teacher-shirley",
-            storageBucket: "teacher-shirley.firebasestorage.app",
-            messagingSenderId: "534843195436",
-            appId: "1:534843195436:web:f1f873e6f6e8c257ce9189"
-        };
-
-        // 初始化 Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        // 設置持久化
-        setPersistence(auth, browserLocalPersistence);
-
-        // 將 Firebase 變量設為全局，以便其他函數使用
-        window.auth = auth;
-        window.db = db;
-        window.doc = doc;
-        window.updateDoc = updateDoc;
-        window.arrayUnion = arrayUnion;
-        window.increment = increment;
-        
-        // 監聽登入狀態
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log("User is signed in:", user.uid);
-                window.currentUser = user;
-            } else {
-                console.log("User is signed out");
-                window.currentUser = null;
-            }
-        });
-    </script>
 
     <script>
         // --- 1. Three.js BRIGHT GALAXY ---
@@ -476,6 +391,7 @@
         async function fetchData(level) {
             document.getElementById('loader').style.display = 'block';
             try {
+                // AUTO-DETECT URL for L1RC, L2RC, L3RC, etc.
                 const url = `https://ducj-creator.github.io/iVocab-Readers/L${level}RC.json`;
                 console.log("Fetching from:", url);
                 const res = await fetch(url);
@@ -486,7 +402,7 @@
                 return true;
             } catch (e) {
                 console.error(e);
-                alert(`Could not load data for Level ${level}. Please check internet connection.`);
+                alert(`Could not load data for Level ${level}. Please check internet connection or URL.`);
                 document.getElementById('loader').style.display = 'none';
                 return false;
             }
@@ -495,32 +411,29 @@
         function processData(data) {
             let lastUnit = "";
             STATE.allData = data.map(item => {
-                // Ensure item.unit is a valid string before checking
                 if (item.unit && typeof item.unit === 'string' && item.unit.trim().length > 0) {
                     lastUnit = item.unit;
                 }
                 
-                // --- FIXED REGEX TO HANDLE "U36" AND "Unit 36" ---
-                // Looks for "Unit" OR "U", followed by optional whitespace and digits
+                // ROBUST REGEX for U36 / Unit 36
                 const match = lastUnit.match(/(?:Unit|U)\s*(\d+)/i);
                 const uNum = match ? parseInt(match[1]) : null;
 
                 return { 
                     ...item, 
                     fullUnitName: lastUnit, 
-                    uNum: uNum // Store the clean number
+                    uNum: uNum 
                 };
             });
         }
 
         async function startQuiz() {
             const level = document.getElementById('level-select').value;
-            const unitVal = document.getElementById('unit-select').value; // e.g., "Unit 36"
+            const unitVal = document.getElementById('unit-select').value; 
             
             if (!level) return alert("Please select a Level first.");
             if (!unitVal) return alert("Please select a Unit.");
 
-            // Extract number from selection
             const selMatch = unitVal.match(/(\d+)/);
             if (!selMatch) return alert("Invalid Unit Selection");
             const targetNum = parseInt(selMatch[0]);
@@ -530,7 +443,7 @@
                 if (!success) return;
             }
 
-            // FILTER BY NUMBER INSTEAD OF STRING
+            // FILTER BY NUMBER
             const qs = STATE.allData.filter(q => q.uNum === targetNum);
             
             if (qs.length === 0) {
@@ -556,8 +469,7 @@
                 
                 let text = q.question.replace(/^\d+\.\s*/, '');
                 
-                // --- FIXED SPLIT LOGIC FOR LEVEL 1 (NO SPACES) ---
-                // Checks for A) B) C) D) with optional whitespace before them
+                // --- SPLIT LOGIC (Handles Both Spaces and No-Spaces) ---
                 let parts = text.split(/(?=\s*[A-D]\))/);
                 
                 const body = parts[0];
@@ -590,144 +502,36 @@
             label.querySelector('input').checked = true;
         }
 
-        // 顯示月光收集通知
-        function showMoonGlowNotification(glowPoints) {
-            const notification = document.createElement('div');
-            notification.className = 'moon-notification';
-            notification.innerHTML = `
-                <span style="font-size: 24px;">🌙</span>
-                <div>
-                    <strong>月光收集成功！</strong><br>
-                    <span style="font-size: 12px; color: #7ed6ff;">獲得 ${glowPoints} 點月光</span>
-                </div>
-            `;
-            document.body.appendChild(notification);
+        function submitQuiz() {
+            let score = 0;
+            let answeredCount = 0;
             
-            // 3秒後自動移除
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 3000);
-        }
-
-async function submitQuiz() {
-    let score = 0;
-    let answeredCount = 0;
-    
-    STATE.currentQuestions.forEach((q, idx) => {
-        const fb = document.getElementById(`feedback-${idx}`);
-        fb.style.display = 'block';
-        const userVal = STATE.userAnswers[idx];
-        
-        if (userVal) {
-            answeredCount++;
-            const isCorrect = userVal === q.answer.trim().toUpperCase();
-            if (isCorrect) score++;
-            fb.innerHTML = isCorrect ? 
-                `<span class="correct">✓ Correct</span>` : 
-                `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
-        } else {
-            fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
-        }
-        
-        const labels = document.querySelectorAll(`input[name="q${idx}"]`);
-        labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
-    });
-
-    if (answeredCount < 5) {
-        if(!confirm("Not all questions answered. Submit anyway?")) return;
-    }
-
-    // 收集月光到月光寶盒
-    if (score > 0) {
-        try {
-            // 方法1：發送消息給父窗口（如果嵌入在月光寶盒中）
-            console.log("嘗試發送消息到父窗口...");
-            if (window.parent && window.parent !== window) {
-                const messageData = {
-                    type: "LUNAR_MISSION_RESULT",
-                    correct: score,
-                    mission: "Mission 5: iVocab Reader 閱讀理解",
-                    title: "Mission 5: iVocab Reader"
-                };
-                console.log("發送消息:", messageData);
-                window.parent.postMessage(messageData, "*");
-            }
-            
-            // 方法2：發送消息給 opener（如果從月光寶盒打開新窗口）
-            if (window.opener && !window.opener.closed) {
-                const messageData = {
-                    type: "LUNAR_MISSION_RESULT",
-                    correct: score,
-                    mission: "Mission 5: iVocab Reader 閱讀理解",
-                    title: "Mission 5: iVocab Reader"
-                };
-                console.log("發送消息給 opener:", messageData);
-                window.opener.postMessage(messageData, "*");
-            }
-            
-            // 方法3：直接更新 Firebase
-            await collectMoonGlow(score);
-            
-            // 顯示通知
-            showMoonGlowNotification(score);
-            
-            console.log(`iVocab Reader 提交完成，分數: ${score}`);
-        } catch (error) {
-            console.error("月光收集失敗:", error);
-        }
-    }
-
-    document.getElementById('submit-btn').style.display = 'none';
-    document.getElementById('results-container').style.display = 'block';
-    document.getElementById('final-score').textContent = `${score} / 5`;
-    document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
-}
-
-        // 收集月光到 Firebase
-        async function collectMoonGlow(glowPoints) {
-            try {
-                if (!window.currentUser) {
-                    console.log("用戶未登入，無法收集月光");
-                    return;
-                }
-
-                const userRef = doc(db, "users", window.currentUser.uid);
+            STATE.currentQuestions.forEach((q, idx) => {
+                const fb = document.getElementById(`feedback-${idx}`);
+                fb.style.display = 'block';
+                const userVal = STATE.userAnswers[idx];
                 
-                // 先獲取當前數據
-                const userSnap = await getDoc(userRef);
-                let currentTotal = 0;
-                let logs = [];
-                
-                if (userSnap.exists()) {
-                    const data = userSnap.data();
-                    currentTotal = data.moonGlowTotal || 0;
-                    logs = data.moonGlowLogs || [];
+                if (userVal) {
+                    answeredCount++;
+                    const isCorrect = userVal === q.answer.trim().toUpperCase();
+                    if (isCorrect) score++;
+                    fb.innerHTML = isCorrect ? 
+                        `<span class="correct">✓ Correct</span>` : 
+                        `<span class="incorrect">✗ Incorrect. Answer: ${q.answer}</span>`;
+                } else {
+                    fb.innerHTML = `<span class="incorrect">Not Answered</span>`;
                 }
                 
-                // 更新總數和日誌
-                const newTotal = currentTotal + glowPoints;
-                const logEntry = {
-                    time: new Date().toISOString(),
-                    correct: glowPoints,
-                    glow: glowPoints,
-                    type: "earn",
-                    source: "Mission 5: iVocab Reader 閱讀理解"
-                };
-                
-                await updateDoc(userRef, {
-                    moonGlowTotal: newTotal,
-                    moonGlowLogs: arrayUnion(logEntry),
-                    lastUpdated: new Date().toISOString()
-                });
-                
-                console.log(`成功收集 ${glowPoints} 點月光，新總數: ${newTotal}`);
-                return true;
-            } catch (error) {
-                console.error("收集月光時出錯:", error);
-                return false;
-            }
+                const labels = document.querySelectorAll(`input[name="q${idx}"]`);
+                labels.forEach(l => l.parentElement.style.pointerEvents = 'none');
+            });
+
+            if (answeredCount < 5) if(!confirm("Not all questions answered. Submit anyway?")) return;
+
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('results-container').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score} / 5`;
+            document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
         }
 
         function resetApp() {
@@ -770,10 +574,7 @@ async function submitQuiz() {
                 const isCorrect = userAns === correctAns;
 
                 let text = q.question.replace(/^\d+\.\s*/, '');
-                
-                // --- FIXED SPLIT LOGIC HERE TOO ---
                 let parts = text.split(/(?=\s*[A-D]\))/);
-                
                 const body = parts[0];
                 const opts = parts.slice(1).map(p => p.trim()).join('<br>');
 
