@@ -41,8 +41,8 @@
         /* Main UI Container */
         .app-container {
             max-width: 900px;
-            margin: 40px auto;
-            padding: 2rem;
+            margin: 20px auto; /* Reduced margin */
+            padding: 1.5rem;   /* Reduced padding */
             min-height: 80vh;
             display: flex;
             flex-direction: column;
@@ -50,7 +50,7 @@
             -webkit-backdrop-filter: blur(10px);
             background: var(--glass-bg);
             border: 1px solid var(--gold-border);
-            border-radius: 24px;
+            border-radius: 20px;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(184, 134, 11, 0.1);
             position: relative;
             z-index: 10;
@@ -58,14 +58,14 @@
 
         header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem; /* Reduced */
             border-bottom: 1px solid var(--gold-border);
-            padding-bottom: 1.5rem;
+            padding-bottom: 1rem;  /* Reduced */
         }
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: 3rem;
+            font-size: 2.5rem; /* Slightly smaller for compactness */
             margin: 0;
             letter-spacing: 1px;
             background: var(--gold-gradient);
@@ -80,24 +80,26 @@
 
         h2 {
             font-family: 'Lato', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 300;
             color: #e0e0e0;
-            margin-top: 15px;
-            letter-spacing: 3px;
+            margin-top: 10px;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
 
         /* Controls */
-        .controls { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
+        .controls { display: flex; gap: 0.8rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
         select, input {
-            padding: 12px 20px; border-radius: 8px; border: 1px solid var(--gold-border);
-            background: rgba(0, 0, 0, 0.7); color: #fcf6ba; font-family: 'Lato', sans-serif; font-size: 1rem; outline: none; transition: 0.3s;
+            padding: 10px 15px; /* Compact padding */
+            border-radius: 6px; border: 1px solid var(--gold-border);
+            background: rgba(0, 0, 0, 0.7); color: #fcf6ba; font-family: 'Lato', sans-serif; font-size: 0.95rem; outline: none; transition: 0.3s;
         }
         select:focus, input:focus { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); border-color: #ffd700; }
 
         button {
-            padding: 12px 30px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer;
+            padding: 10px 25px; /* Compact padding */
+            border-radius: 6px; border: none; font-weight: 700; cursor: pointer;
             font-family: 'Cinzel', serif; letter-spacing: 1px; transition: all 0.2s;
             background: linear-gradient(135deg, #b38728, #fcf6ba, #bf953f);
             color: #1a0500; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); border: 1px solid #ffd700;
@@ -106,50 +108,70 @@
         button.secondary { background: transparent; border: 1px solid #fcf6ba; color: #fcf6ba; box-shadow: none; }
         button.secondary:hover { background: rgba(255, 215, 0, 0.15); color: white; }
 
-        /* Question Cards */
+        /* Question Cards - COMPACT UPDATE */
         .quiz-area { display: none; animation: fadeIn 0.8s ease; }
         .question-card {
-            background: rgba(255, 255, 255, 0.04); margin-bottom: 2rem; padding: 2rem;
+            background: rgba(255, 255, 255, 0.04); 
+            margin-bottom: 1.5rem; /* Reduced margin */
+            padding: 1.5rem;       /* Reduced padding */
             border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); border-left: 4px solid #b38728;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .question-text { font-size: 1.25rem; line-height: 1.6; margin-bottom: 1.5rem; }
-        .question-options-block { margin-top: 1.2rem; padding-left: 1.5rem; color: #d1d5db; font-size: 1.15rem; line-height: 2; border-left: 1px solid rgba(255, 255, 255, 0.2); }
-        .options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 1.5rem; }
+        .question-text { font-size: 1.15rem; line-height: 1.5; margin-bottom: 1rem; }
+        
+        /* Compact Option Text */
+        .question-options-block { 
+            margin-top: 0.8rem; 
+            padding-left: 1rem; 
+            color: #d1d5db; 
+            font-size: 1.05rem; 
+            line-height: 1.4; /* TIGHTER LINE HEIGHT */
+            border-left: 1px solid rgba(255, 255, 255, 0.2); 
+        }
+        
+        /* Compact Buttons Grid */
+        .options-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 8px; /* TIGHTER GAP */
+            margin-top: 1rem; 
+        }
+        
         .option-label {
-            display: flex; align-items: center; justify-content: center; padding: 12px;
-            background: rgba(255, 215, 0, 0.05); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 8px; cursor: pointer;
-            transition: all 0.2s; color: #fcf6ba; font-weight: bold; font-family: 'Cinzel', serif;
+            display: flex; align-items: center; justify-content: center; 
+            padding: 8px; /* THINNER BUTTONS */
+            background: rgba(255, 215, 0, 0.05); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 6px; cursor: pointer;
+            transition: all 0.2s; color: #fcf6ba; font-weight: bold; font-family: 'Cinzel', serif; font-size: 0.95rem;
         }
         .option-label:hover { background: rgba(255, 215, 0, 0.25); box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); transform: translateY(-2px); }
         .option-label.checked { background: linear-gradient(135deg, #b38728, #fcf6ba); color: #222; border-color: #fff; box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
         .option-label input { display: none; }
 
         /* Feedback */
-        .feedback-container { margin-top: 20px; padding: 15px; border-radius: 8px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);}
-        .correct { color: #4ade80; font-weight: bold; font-size: 1.1rem; text-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }
-        .incorrect { color: #ff6b6b; font-weight: bold; font-size: 1.1rem; text-shadow: 0 0 10px rgba(255, 107, 107, 0.4); }
+        .feedback-container { margin-top: 15px; padding: 10px; border-radius: 6px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);}
+        .correct { color: #4ade80; font-weight: bold; font-size: 1rem; text-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }
+        .incorrect { color: #ff6b6b; font-weight: bold; font-size: 1rem; text-shadow: 0 0 10px rgba(255, 107, 107, 0.4); }
 
         /* Results */
         .results-area { display: none; text-align: center; animation: fadeIn 0.8s ease; }
         .score-display {
-            font-size: 5rem; font-family: 'Cinzel', serif;
+            font-size: 4rem; font-family: 'Cinzel', serif;
             background: linear-gradient(to bottom, #ffffbe 0%, #d4af37 50%, #b8860b 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin: 1rem 0; font-weight: bold; filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+            margin: 0.5rem 0; font-weight: bold; filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
         }
         .info-inputs {
-            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; max-width: 650px;
-            margin: 30px auto; text-align: left; padding: 25px;
-            background: rgba(0,0,0,0.4); border-radius: 16px; border: 1px solid rgba(255,215,0,0.1);
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; max-width: 600px;
+            margin: 20px auto; text-align: left; padding: 20px;
+            background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px solid rgba(255,215,0,0.1);
         }
-        .input-group label { display: block; margin-bottom: 8px; color: #fcf6ba; font-size: 0.95rem; letter-spacing: 1px; }
+        .input-group label { display: block; margin-bottom: 6px; color: #fcf6ba; font-size: 0.9rem; letter-spacing: 1px; }
         .input-group input { width: 100%; box-sizing: border-box; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .loader {
-            border: 4px solid rgba(255,215,0,0.1); border-left-color: #ffd700; border-radius: 50%; width: 50px; height: 50px;
-            animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite; display: none; margin: 30px auto; box-shadow: 0 0 20px rgba(255,215,0,0.2);
+            border: 4px solid rgba(255,215,0,0.1); border-left-color: #ffd700; border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite; display: none; margin: 20px auto; box-shadow: 0 0 20px rgba(255,215,0,0.2);
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
@@ -165,26 +187,26 @@
             color: #000000;      /* Ink black */
             width: 90%; max-width: 800px; height: 90%;
             overflow-y: auto;
-            padding: 40px;
+            padding: 30px;
             border-radius: 8px;
             box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
             position: relative;
             display: flex; flex-direction: column;
         }
-        .report-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; font-family: serif; }
+        .report-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px; font-family: serif; }
         .report-details { display: flex; justify-content: space-between; margin-bottom: 20px; font-family: sans-serif; font-size: 14px; background: #f5f5f5; padding: 15px; }
         .report-body { font-family: serif; flex-grow: 1; }
         
-        /* Report Question Styles */
-        .report-q-item { margin-bottom: 25px; page-break-inside: avoid; border-bottom: 1px dashed #ccc; padding-bottom: 20px; }
-        .report-q-text { font-weight: bold; margin-bottom: 10px; font-size: 16px; }
-        .report-options { margin-left: 20px; color: #444; font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
-        .report-status { font-family: sans-serif; font-size: 13px; font-weight: bold; padding: 5px 10px; border-radius: 4px; display: inline-block; }
+        /* Report Question Styles - COMPACT REPORT */
+        .report-q-item { margin-bottom: 15px; page-break-inside: avoid; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
+        .report-q-text { font-weight: bold; margin-bottom: 5px; font-size: 15px; }
+        .report-options { margin-left: 20px; color: #444; font-size: 13px; line-height: 1.4; margin-bottom: 5px; }
+        .report-status { font-family: sans-serif; font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 4px; display: inline-block; }
         .status-correct { background: #e6fffa; color: #047857; border: 1px solid #047857; }
         .status-wrong { background: #fff5f5; color: #c53030; border: 1px solid #c53030; }
 
         .modal-actions {
-            margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;
+            margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;
             display: flex; gap: 15px; justify-content: center;
         }
         .btn-download { background: #000; color: #fff; border: none; }
@@ -223,19 +245,19 @@
         <div class="loader" id="loader"></div>
 
         <div id="quiz-container" class="quiz-area">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                 <h3 id="current-unit-title" style="color: #fcf6ba; font-family: 'Cinzel'; font-size: 1.8rem; border-bottom: 2px solid #b38728; display:inline-block; padding-bottom:10px; margin-top:0;">Unit Title</h3>
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                 <h3 id="current-unit-title" style="color: #fcf6ba; font-family: 'Cinzel'; font-size: 1.6rem; border-bottom: 2px solid #b38728; display:inline-block; padding-bottom:8px; margin-top:0;">Unit Title</h3>
             </div>
             
             <div id="questions-list"></div>
             
-            <div style="text-align: center; margin-top: 3rem;">
-                <button id="submit-btn" onclick="submitQuiz()" style="font-size: 1.2rem; padding: 15px 60px;">Submit Answers</button>
+            <div style="text-align: center; margin-top: 2rem;">
+                <button id="submit-btn" onclick="submitQuiz()" style="font-size: 1.1rem; padding: 12px 50px;">Submit Answers</button>
             </div>
         </div>
 
         <div id="results-container" class="results-area">
-            <h2 style="color: #fcf6ba; font-size: 2rem;">Assessment Complete</h2>
+            <h2 style="color: #fcf6ba; font-size: 1.8rem;">Assessment Complete</h2>
             <div class="score-display" id="final-score">0 / 5</div>
             
             <div class="info-inputs">
@@ -253,7 +275,7 @@
                 </div>
             </div>
 
-            <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center;">
                 <button onclick="openPreviewModal()">Review & Download Report</button>
                 <button class="secondary" onclick="resetApp()">New Quiz</button>
             </div>
@@ -264,8 +286,8 @@
         <div class="modal-content">
             <div id="report-content">
                 <div class="report-header">
-                    <h1 style="font-size:28px; margin:0;">Shirley's Interactive iVocab Reader</h1>
-                    <h2 style="font-size:18px; color:#555; margin:5px 0 0 0; font-family:sans-serif;">Comprehensive Assessment Report</h2>
+                    <h1 style="font-size:24px; margin:0;">Shirley's Interactive iVocab Reader</h1>
+                    <h2 style="font-size:16px; color:#555; margin:5px 0 0 0; font-family:sans-serif;">Comprehensive Assessment Report</h2>
                 </div>
                 
                 <div class="report-details">
@@ -279,15 +301,15 @@
                     </div>
                 </div>
 
-                <div style="background:#f9f9f9; padding:15px; text-align:center; border:2px solid #eee; margin-bottom:30px;">
-                    <span style="font-size:14px; color:#666; font-family:sans-serif;">FINAL SCORE</span><br>
-                    <span id="rep-score" style="font-size:48px; font-weight:bold; color:#000;"></span>
+                <div style="background:#f9f9f9; padding:10px; text-align:center; border:2px solid #eee; margin-bottom:20px;">
+                    <span style="font-size:12px; color:#666; font-family:sans-serif;">FINAL SCORE</span><br>
+                    <span id="rep-score" style="font-size:36px; font-weight:bold; color:#000;"></span>
                 </div>
 
                 <div class="report-body" id="rep-questions-container">
                     </div>
                 
-                <div style="margin-top:30px; border-top:1px solid #ddd; padding-top:10px; font-size:10px; color:#999; text-align:center; font-family:sans-serif;">
+                <div style="margin-top:20px; border-top:1px solid #ddd; padding-top:10px; font-size:10px; color:#999; text-align:center; font-family:sans-serif;">
                     Generated by iVocab System | Verified Assessment
                 </div>
             </div>
@@ -583,7 +605,7 @@
                     statusHtml = `<span class="report-status status-correct">✓ Correct (Your Answer: ${userAns})</span>`;
                 } else {
                     statusHtml = `<span class="report-status status-wrong">✗ Incorrect (Your Answer: ${userAns})</span> 
-                                  <span style="font-size:13px; margin-left:10px;">Correct Answer: <strong>${correctAns}</strong></span>`;
+                                  <span style="font-size:12px; margin-left:8px;">Correct Answer: <strong>${correctAns}</strong></span>`;
                 }
 
                 const itemDiv = document.createElement('div');
