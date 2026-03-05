@@ -556,6 +556,19 @@
             document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
         }
 
+        // ========== 新增：自動回報成績給月光寶盒 ==========
+            if (window.opener) {
+                window.opener.postMessage({
+                    type: "LUNAR_MISSION_RESULT",
+                    correct: score,  // 正確題數（0-5）
+                    mission: "Mission 5: iVocab Reader閱讀理解題"
+                }, "*");
+                console.log("已發送成績給月光寶盒，正確題數：", score);
+            } else {
+                console.log("未檢測到 opener（可能直接開啟頁面），不發送訊息");
+            }
+            // ==============================================
+        }
         function resetApp() {
             document.getElementById('quiz-container').style.display = 'none';
             document.getElementById('results-container').style.display = 'none';
