@@ -231,7 +231,7 @@
                 <option value="2">Level 2</option>
                 <option value="3">Level 3</option>
                 <option value="4">Level 4</option>
-                <option value="5" disabled>Level 5 (Coming Soon)</option>
+                <option value="5">Level 5</option>
                 <option value="6" disabled>Level 6 (Coming Soon)</option>
             </select>
 
@@ -554,19 +554,6 @@
             document.getElementById('results-container').style.display = 'block';
             document.getElementById('final-score').textContent = `${score} / 5`;
             document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
-
-            // ========== 新增：自動回報成績給月光寶盒 ==========
-            if (window.opener) {
-                window.opener.postMessage({
-                    type: "LUNAR_MISSION_RESULT",
-                    correct: score,
-                    mission: "Mission 5: iVocab Reader閱讀理解題"
-                }, "*");
-                console.log("已發送成績給月光寶盒，正確題數：", score);
-            } else {
-                console.log("未檢測到 opener（可能直接開啟頁面），不發送訊息");
-            }
-            // ==============================================
         }
 
         function resetApp() {
